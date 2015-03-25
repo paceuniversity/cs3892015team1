@@ -1,12 +1,21 @@
 package com.whatsaround.whatsaround;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.Toast;
+//import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    static final int REQUEST_IMAGE_CAPTURE  = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,4 +45,28 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+
+    //Call the camera app when the "+" button is clicked
+    public void goToCamera(View view) {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+            startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
+
+    }
+
+    //When the Context of the application come back from the camera app to this activity,
+    //it shows a little message: "Picture Taken"
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent receivedIntent){
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE){
+            if(resultCode == RESULT_OK){
+                String message = getString(R.string.toast_picture_taken);
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }

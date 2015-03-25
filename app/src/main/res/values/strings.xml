@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">WhatsAround</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="camera_button">+</string>
+    <string name="toast_picture_taken">Picture Taken</string>
 </resources>
