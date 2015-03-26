@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 //import android.widget.Toast;
 
+// Mike was here :~)
+
 
 public class MainActivity extends ActionBarActivity {
 
