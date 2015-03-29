@@ -15,24 +15,6 @@
         android:layout_toLeftOf="@+id/fileText"
         android:layout_toStartOf="@+id/fileText" />
 
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/scrollView"
-        android:layout_above="@+id/fileText"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="71dp" >
-
-        <HorizontalScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/horizontalScrollView"
-            android:layout_alignBottom="@+id/scrollView"
-            android:layout_centerHorizontal="true" >
-
-        </HorizontalScrollView>
-    </ScrollView>
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,15 +23,6 @@
         android:layout_alignBottom="@+id/button_files"
         android:layout_toRightOf="@+id/camera_button"
         android:layout_toEndOf="@+id/camera_button" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/testPicture"
-        android:layoutDirection="inherit"
-        android:adjustViewBounds="true"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"/>
 
     <Button
         style="?android:attr/buttonStyleSmall"
