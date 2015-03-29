@@ -2,14 +2,20 @@ package com.whatsaround.whatsaround;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,17 +28,32 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 //import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 
-    static final int REQUEST_IMAGE_CAPTURE  = 1;
+    private static final int REQUEST_IMAGE_CAPTURE  = 1;
     protected String path;
+    private static final int REQUEST_IMAGE_LOAD = 2;
+    private final String MAIN_ACTIVITY = "MainActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Button addPhotoButton = (Button)findViewById(R.id.button_add_photo);
+        addPhotoButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Log.d(MAIN_ACTIVITY, "onclick for button");
+                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, REQUEST_IMAGE_LOAD);
+            }
+        });
+
         createDirectory();
         try {
             createFile();
@@ -127,11 +148,32 @@ public class MainActivity extends ActionBarActivity {
     //it shows a little message: "Picture Taken"
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent receivedIntent){
+        super.onActivityResult(requestCode, resultCode, receivedIntent);
+
+        Log.d(MAIN_ACTIVITY, "onActivityResult reached");
 
         if (requestCode == REQUEST_IMAGE_CAPTURE){
-            if(resultCode == RESULT_OK){
+            if(resultCode == RESULT_OK && receivedIntent != null){
                 String message = getString(R.string.toast_picture_taken);
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+        }
+
+        else if(requestCode == REQUEST_IMAGE_LOAD){
+
+            Log.d(MAIN_ACTIVITY, "REQUESTED IMAGE LOAD REACHED");
+
+            if(resultCode == RESULT_OK && receivedIntent != null){
+                Uri selectedImage = receivedIntent.getData();
+                String text = receivedIntent.getDataString();
+                String[] filePath = {MediaStore.Images.Media.DATA};
+                Cursor cursor = getContentResolver().query(selectedImage, filePath, null, null, null);
+                cursor.moveToFirst();
+                int index = cursor.getColumnIndex(filePath[0]);
+                String picPath = cursor.getString(index);
+                cursor.close();
+                ImageView image = (ImageView)findViewById(R.id.testPicture);
+                image.setImageBitmap(BitmapFactory.decodeFile(picPath));
             }
         }
     }
