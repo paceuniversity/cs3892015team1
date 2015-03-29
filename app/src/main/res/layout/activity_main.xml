@@ -9,10 +9,9 @@
         android:id="@+id/camera_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="67dp"
         android:text="@string/camera_button"
         android:onClick="goToCamera"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/fileText"
         android:layout_toStartOf="@+id/fileText" />
 
@@ -21,9 +20,8 @@
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/fileText"
-        android:layout_above="@+id/camera_button"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="48dp" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -31,19 +29,26 @@
         android:text="Add Photo"
         android:id="@+id/button_add_photo"
         android:layout_alignTop="@+id/camera_button"
-        android:layout_toRightOf="@+id/fileText"
-        android:layout_toEndOf="@+id/fileText" />
+        android:layout_toRightOf="@+id/camera_button"
+        android:layout_toEndOf="@+id/fileText"/>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/testPicture"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
         android:layoutDirection="inherit"
-        android:adjustViewBounds="true"/>
+        android:adjustViewBounds="true"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="See Files"
+        android:id="@+id/button_files"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/button_add_photo"/>
 
 
 </RelativeLayout>
