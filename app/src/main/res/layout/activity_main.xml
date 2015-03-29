@@ -15,22 +15,32 @@
         android:layout_toLeftOf="@+id/fileText"
         android:layout_toStartOf="@+id/fileText" />
 
-    <TextView
+    <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/fileText"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:id="@+id/scrollView"
+        android:layout_above="@+id/fileText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="71dp" >
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/horizontalScrollView"
+            android:layout_alignBottom="@+id/scrollView"
+            android:layout_centerHorizontal="true" >
+
+        </HorizontalScrollView>
+    </ScrollView>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add Photo"
         android:id="@+id/button_add_photo"
-        android:layout_alignTop="@+id/camera_button"
+        android:layout_alignBottom="@+id/button_files"
         android:layout_toRightOf="@+id/camera_button"
-        android:layout_toEndOf="@+id/fileText"/>
+        android:layout_toEndOf="@+id/camera_button" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -49,6 +59,14 @@
         android:id="@+id/button_files"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/button_add_photo"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/fileText"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

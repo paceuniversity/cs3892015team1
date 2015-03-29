@@ -35,8 +35,6 @@ public class ListPicturesActivity extends Activity {
             TextView tv = (TextView)findViewById(R.id.textView_no_pictures);
             tv.setText("You have no pictures yet :(\n\nGo back to start adding pictures");
         }
-
-
     }
 
 
