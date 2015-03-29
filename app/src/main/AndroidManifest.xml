@@ -2,10 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.whatsaround.whatsaround" >
 
-    <!-->Camera usage<-->
-    <uses-feature android:name="android.hardware.camera"
+    <!-- >Camera usage< -->
+    <uses-sdk
+        android:minSdkVersion="11"
+        android:targetSdkVersion="19"/>
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -21,6 +26,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ListPicturesActivity"
+            android:label="@string/title_activity_list_pictures" >
         </activity>
     </application>
 

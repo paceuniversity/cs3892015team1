@@ -1,5 +1,6 @@
 package com.whatsaround.whatsaround;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -31,7 +32,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 //import android.widget.Toast;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     private static final int REQUEST_IMAGE_CAPTURE  = 1;
     protected String path;
@@ -48,9 +49,20 @@ public class MainActivity extends ActionBarActivity {
         addPhotoButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Log.d(MAIN_ACTIVITY, "onclick for button");
-                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Log.d(MAIN_ACTIVITY, "onclick for addPhotoButton");
+                Intent intent = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent, REQUEST_IMAGE_LOAD);
+            }
+        });
+
+        Button seeFilesButton = (Button)findViewById(R.id.button_files);
+        seeFilesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(MAIN_ACTIVITY, "onclick for seeFilesButton");
+                Intent intent = new Intent(MainActivity.this, ListPicturesActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -177,5 +189,4 @@ public class MainActivity extends ActionBarActivity {
             }
         }
     }
-
 }
