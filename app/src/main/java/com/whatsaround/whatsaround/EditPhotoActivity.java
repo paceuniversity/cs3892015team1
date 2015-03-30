@@ -135,6 +135,7 @@ public class EditPhotoActivity extends Activity {
             cursor.moveToFirst();
             int index = cursor.getColumnIndex(filePath[0]);
             String picPath = cursor.getString(index);
+            Log.d(ACTIVITY, "The location of the photo is: " + picPath);
             cursor.close();
             ImageView image = (ImageView)findViewById(R.id.picture);
             image.setImageBitmap(BitmapFactory.decodeFile(picPath));
