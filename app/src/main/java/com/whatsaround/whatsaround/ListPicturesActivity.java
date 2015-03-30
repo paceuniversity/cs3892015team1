@@ -15,11 +15,13 @@ import com.whatsaround.whatsaround.com.whatsaround.whatsaround.dataType.PictureW
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 
@@ -57,8 +59,27 @@ public class ListPicturesActivity extends Activity {
         } else {
             File dir = getExternalFilesDir(null);
             File file = new File(dir, FILE_NAME);
+
             try {
-                listItems.add(String.valueOf(readFile(file,1)));
+                StringWriter out = new StringWriter();
+                JSONArray json = readFile(file,1);
+
+                for (int i = 0; i < json.length(); i++)
+                {
+                    // Declare and initialize so the compiler doesn't complain
+                    String word = "", uri = "";
+                    if( json.getJSONObject(i).has("word") ) {
+                        uri = json.getJSONObject(i).getString("uri");
+                    }
+                    if( json.getJSONObject(i).has("word") ) {
+                        word = json.getJSONObject(i).getString("word");
+                    }
+                    Log.d(ACTIVITY, word);
+                    // image.setImageBitmap(BitmapFactory.decodeFile(uri));
+                    listItems.add(uri + " - " + word);
+                }
+
+                //listItems.add(String.valueOf(readFile(file,1)));
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
