@@ -64,11 +64,11 @@ public class CustomAdapter extends BaseAdapter{
         View rowView;
         rowView = inflater.inflate(R.layout.object_list, null);
         holder.tv=(TextView) rowView.findViewById(R.id.word);
-        holder.img=(ImageView) rowView.findViewById(R.id.picture);
+        //holder.img=(ImageView) rowView.findViewById(R.id.picture);
         holder.tv.setText(result.get(position));
         Log.d(ACTIVITY, "Successfully set text for " + result.get(position));
         Log.d(ACTIVITY, "Trying to set picture for " + Uri.parse(image.get(position)));
-        holder.img.setImageResource(R.drawable.chair);
+        //holder.img.setImageResource(R.drawable.chair);
         Log.d(ACTIVITY, result.get(position) + " is set!");
         return rowView;
     }
