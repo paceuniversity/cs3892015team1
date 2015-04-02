@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,11 +21,13 @@ import android.widget.TextView;
 import com.whatsaround.whatsaround.com.whatsaround.whatsaround.dataType.PictureWord;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 
 public class PictureWordActivity extends Activity {
 
     private final String ACTIVITY = "PictureWordActivity";
+    private Uri uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,45 +38,57 @@ public class PictureWordActivity extends Activity {
 
         Intent intent = getIntent();
         String word = intent.getStringExtra("word");
-        Uri uri = Uri.parse(intent.getStringExtra("uri"));
-        String path = getRealPathFromURI(uri);
-
-        Log.d(ACTIVITY, "The location of the photo is: " + path);
-        int orientation = getExifOrientation(path);
-        Bitmap bitmap = BitmapFactory.decodeFile(path);
-        int rotate;
-        switch(orientation){
-            case 90: rotate = 90;
-                     break;
-            case 180: rotate = 180;
-                     break;
-            case 270: rotate = 270;
-                     break;
-            default: rotate = 0;
-                     break;
-        }
-        if(rotate != 0){
-            Matrix matrix = new Matrix();
-            matrix.postRotate(90);
-            Bitmap bit = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            ImageView image = (ImageView)findViewById(R.id.picture);
-            image.setImageBitmap(bit);
-        }
-        else {
-            ImageView image = (ImageView)findViewById(R.id.picture);
-            image.setImageBitmap(bitmap);
-        }
+        uri = Uri.parse(intent.getStringExtra("uri"));
 
         TextView tv = (TextView)findViewById(R.id.label);
         tv.setText(word);
-    }
 
+//        String path = getRealPathFromURI(uri);
+//
+//        LoadPicture task = new LoadPicture();
+//        task.execute(uri);
+//
+//        Log.d(ACTIVITY, "The location of the photo is: " + path);
+//        int orientation = getExifOrientation(path);
+//        Bitmap bitmap = BitmapFactory.decodeFile(path);
+//        int rotate;
+//        switch(orientation){
+//            case 90: rotate = 90;
+//                     break;
+//            case 180: rotate = 180;
+//                     break;
+//            case 270: rotate = 270;
+//                     break;
+//            default: rotate = 0;
+//                     break;
+//        }
+//        if(rotate != 0){
+//            Matrix matrix = new Matrix();
+//            matrix.postRotate(90);
+//            Bitmap bit = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+//            ImageView image = (ImageView)findViewById(R.id.picture);
+//            image.setImageBitmap(bit);
+//        }
+//        else {
+//            ImageView image = (ImageView)findViewById(R.id.picture);
+//            image.setImageBitmap(bitmap);
+//        }
+
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_picture_word, menu);
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LoadPicture task = new LoadPicture();
+        task.doInBackground(uri);
     }
 
     @Override
@@ -130,5 +145,48 @@ public class PictureWordActivity extends Activity {
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         return cursor.getString(column_index);
+    }
+
+    private class LoadPicture extends AsyncTask<Uri, Void, Bitmap>{
+        @Override
+        protected Bitmap doInBackground(Uri... uris) {
+            if(uris.length > 1){
+                Log.d(ACTIVITY, "More than one uri\n " + uris);
+            }
+            String path = getRealPathFromURI(uris[0]);
+
+            Log.d(ACTIVITY, "The location of the photo is: " + path);
+            int orientation = getExifOrientation(path);
+            Bitmap bitmap = BitmapFactory.decodeFile(path);
+            int rotate;
+            switch(orientation){
+                case 90: rotate = 90;
+                    break;
+                case 180: rotate = 180;
+                    break;
+                case 270: rotate = 270;
+                    break;
+                default: rotate = 0;
+                    break;
+            }
+            if(rotate != 0){
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+                Bitmap bit = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                bitmap = bit;
+            }
+
+            ImageView image = (ImageView)findViewById(R.id.picture);
+            image.setImageBitmap(bitmap);
+
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            ImageView image = (ImageView)findViewById(R.id.picture);
+            image.setImageBitmap(bitmap);
+        }
     }
 }
