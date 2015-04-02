@@ -46,7 +46,7 @@ public class EditPhotoActivity extends Activity {
 
         Log.d(ACTIVITY, "Selecting photo");
         Intent intent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, REQUEST_IMAGE_LOAD);
 
         Button saveButton = (Button)findViewById(R.id.save_button);

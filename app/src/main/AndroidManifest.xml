@@ -39,6 +39,10 @@
             android:name=".EditPhotoActivity"
             android:label="@string/title_activity_edit_photo" >
         </activity>
+        <activity
+            android:name=".PictureWordActivity"
+            android:label="@string/title_activity_picture_word" >
+        </activity>
     </application>
 
 </manifest>

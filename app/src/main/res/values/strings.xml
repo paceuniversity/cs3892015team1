@@ -8,4 +8,5 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_edit_photo">EditPhotoActivity</string>
+    <string name="title_activity_picture_word">PictureWordActivity</string>
 </resources>
