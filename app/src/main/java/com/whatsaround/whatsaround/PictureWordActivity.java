@@ -40,7 +40,7 @@ public class PictureWordActivity extends Activity {
 
         Log.d(ACTIVITY, "The location of the photo is: " + path);
         int orientation = getExifOrientation(path);
-        Bitmap bitmap = decodeSampledBitmapFromResource(path, 75, 75);
+        Bitmap bitmap = decodeSampledBitmapFromResource(path, 500, 500);
         int rotate;
         switch(orientation){
             case 90: rotate = 90;
