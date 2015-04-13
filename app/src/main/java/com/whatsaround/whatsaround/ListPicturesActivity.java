@@ -1,16 +1,12 @@
 package com.whatsaround.whatsaround;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Picture;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,6 +31,10 @@ public class ListPicturesActivity extends Activity {
     private final String ACTIVITY = "ListPicturesActivity";
     private final String FILE_NAME = "WAData";
 
+    // Declare two array lists to store our words and URIs
+    ArrayList<String> wordList = new ArrayList<String>();
+    ArrayList<String> pictureList = new ArrayList<String>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,38 +54,45 @@ public class ListPicturesActivity extends Activity {
             File dir = getExternalFilesDir(null);
             File file = new File(dir, FILE_NAME);
 
-            //Declares ArrayList of PictureWords
-            final ArrayList<PictureWord> picWords = new ArrayList<PictureWord>();
+            try {
+                JSONArray json = readFile(file,1);
 
-            try{
-                JSONArray data = readFile(file, 1);
-
-                for (int i = 0; i < data.length(); i++) {
-                    String word = data.getJSONObject(i).getString("word");
-                    String uri = data.getJSONObject(i).getString("uri");
-
-                    picWords.add(new PictureWord(word, uri));
+                for (int i = 0; i < json.length(); i++)
+                {
+                    // Declare and initialize so the compiler doesn't complain
+                    String word = "", uri = "";
+                    // We'll check to see if the current JSONObject has the "word" attribute
+                    // If it doesn't, we'll ignore any "uri" or "word" attribute
+                    if( json.getJSONObject(i).has("word") ) {
+                        uri = json.getJSONObject(i).getString("uri");
+                    }
+                    if( json.getJSONObject(i).has("word") ) {
+                        word = json.getJSONObject(i).getString("word");
+                    }
+                    Log.d(ACTIVITY, word);
+                    // image.setImageBitmap(BitmapFactory.decodeFile(uri));
+                    // We make sure the JSONObject has a set "word" attribute, a set "uri" attribute, and is not something like "android.widget.EditText..."
+                    // I had a few instances of the last case and it made things very odd
+                    if  (!json.getJSONObject(i).isNull("word") && !json.getJSONObject(i).isNull("uri") &&
+                            !json.getJSONObject(i).getString("word").matches("android.widget.EditText@(.*)") ) {
+                        // Add both the word and uri to their corresponding ArrayLists
+                        Log.d(ACTIVITY, "The word is: " + word);
+                        wordList.add(word);
+                        Log.d(ACTIVITY, "The uri is: " + uri);
+                        pictureList.add(uri);
+                    }
                 }
-            }
-            catch(Exception e){
-                Log.d(ACTIVITY, "Error\n" + e.getMessage());
-            }
 
-            ArrayAdapter<PictureWord> adapter = new ArrayAdapter<PictureWord>(
-                    this, android.R.layout.simple_list_item_1, picWords);
-            lv.setAdapter(adapter);
+                // Set the list view adapter to the custom adapter class
+                lv.setAdapter(new CustomAdapter(this, wordList, pictureList));
 
-            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent intent = new Intent(
-                            ListPicturesActivity.this, PictureWordActivity.class);
-                    intent.putExtra("word", picWords.get(position).word);
-                    intent.putExtra("uri", picWords.get(position).picUri.toString());
-                    startActivity(intent);
-                    //Log.d(ACTIVITY, "OnItemClick: AdapterView, " + parent +" View, " + view + " position, " + position + " id, " + id);
-                }
-            });
+                //listItems.add(String.valueOf(readFile(file,1)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            //adapter.notifyDataSetChanged();
         }
     }
 
