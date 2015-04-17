@@ -3,7 +3,10 @@ package com.whatsaround.whatsaround;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -51,9 +54,10 @@ public class EditPhotoActivity extends Activity {
         Log.d(ACTIVITY, "fromCamera = " + fromCamera);
 
         if(fromCamera != null){
-            selectedImage = Uri.parse(fromCamera);
-            ImageView image = (ImageView)findViewById(R.id.picture);
-            image.setImageURI(selectedImage);
+              loadPicFromUri(Uri.parse(fromCamera));
+//            selectedImage = Uri.parse(fromCamera);
+//            ImageView image = (ImageView)findViewById(R.id.picture);
+//            image.setImageURI(selectedImage);
         }
 
         else {
@@ -143,16 +147,17 @@ public class EditPhotoActivity extends Activity {
 
         if(requestCode == REQUEST_IMAGE_LOAD && resultCode == RESULT_OK){
             selectedImage = data.getData();
-            String text = data.getDataString();
-            String[] filePath = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(selectedImage, filePath, null, null, null);
-            cursor.moveToFirst();
-            int index = cursor.getColumnIndex(filePath[0]);
-            String picPath = cursor.getString(index);
-            Log.d(ACTIVITY, "The location of the photo is: " + picPath);
-            cursor.close();
-            ImageView image = (ImageView)findViewById(R.id.picture);
-            image.setImageBitmap(BitmapFactory.decodeFile(picPath));
+//            String[] filePath = {MediaStore.Images.Media.DATA};
+//            Cursor cursor = getContentResolver().query(selectedImage, filePath, null, null, null);
+//            cursor.moveToFirst();
+//            int index = cursor.getColumnIndex(filePath[0]);
+//            String picPath = cursor.getString(index);
+//            Log.d(ACTIVITY, "The location of the photo is: " + picPath);
+//            cursor.close();
+
+            loadPicFromUri(selectedImage);
+//            ImageView image = (ImageView)findViewById(R.id.picture);
+//            image.setImageBitmap(BitmapFactory.decodeFile(picPath));
         }
     }
 
@@ -237,6 +242,42 @@ public class EditPhotoActivity extends Activity {
         return data;
     }
 
+    private void loadPicFromUri(Uri uri){
+        String[] filePath = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri, filePath, null, null, null);
+        cursor.moveToFirst();
+        int index = cursor.getColumnIndex(filePath[0]);
+        String picPath = cursor.getString(index);
+        Log.d(ACTIVITY, "The location of the photo is: " + picPath);
+        cursor.close();
+
+        int orientation = getExifOrientation(picPath);
+        Bitmap bitmap = BitmapFactory.decodeFile(picPath);
+        int rotate;
+        switch(orientation){
+            case 90: rotate = 90;
+                break;
+            case 180: rotate = 180;
+                break;
+            case 270: rotate = 270;
+                break;
+            default: rotate = 0;
+                break;
+        }
+        if(rotate != 0){
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            Bitmap bit = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            ImageView image = (ImageView)findViewById(R.id.picture);
+            image.setImageBitmap(bit);
+        }
+        else {
+            ImageView image = (ImageView)findViewById(R.id.picture);
+            image.setImageBitmap(bitmap);
+        }
+
+    }
+
     public boolean checkExternalStorage(){
         String state = Environment.getExternalStorageState();
 
@@ -250,6 +291,34 @@ public class EditPhotoActivity extends Activity {
             Toast.makeText(this, "External Storage is not accessible", Toast.LENGTH_LONG).show();
         }
         return false;
+    }
+
+    private int getExifOrientation(String filepath) {// YOUR MEDIA PATH AS STRING
+        int degree = 0;
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(filepath);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        if (exif != null) {
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
+            if (orientation != -1) {
+                switch (orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        degree = 90;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        degree = 180;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        degree = 270;
+                        break;
+                }
+
+            }
+        }
+        return degree;
     }
 }
 

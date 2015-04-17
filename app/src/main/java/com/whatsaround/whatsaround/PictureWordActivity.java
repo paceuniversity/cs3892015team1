@@ -35,6 +35,7 @@ public class PictureWordActivity extends Activity {
         String word = intent.getStringExtra("word");
         Uri uri = Uri.parse(intent.getStringExtra("uri"));
         String path = getRealPathFromURI(uri);
+        Log.d(ACTIVITY, "Image URI = " + uri);
 
         Log.d(ACTIVITY, "The location of the photo is: " + path);
         int orientation = getExifOrientation(path);

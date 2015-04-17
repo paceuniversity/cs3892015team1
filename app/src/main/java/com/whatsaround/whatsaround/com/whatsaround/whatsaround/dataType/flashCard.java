@@ -1,19 +1,18 @@
 package com.whatsaround.whatsaround.com.whatsaround.whatsaround.dataType;
 
+import android.graphics.Bitmap;
 import android.media.Image;
 
 /**
  * Created by Kyle on 04/16/2015.
  */
 public class flashCard {
-    private Image picture;
+    private Bitmap picture;
     private String word;
 
-    public void setPicture(Image picture) {
-        this.picture = picture;
-    }
+    public void setPicture(Bitmap picture) { this.picture = picture; }
 
-    public Image getPicture() {
+    public Bitmap getPicture() {
         return picture;
     }
 
