@@ -44,10 +44,24 @@ public class EditPhotoActivity extends Activity {
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Log.d(ACTIVITY, "Selecting photo");
-        Intent intent = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, REQUEST_IMAGE_LOAD);
+        Intent thisIntent = getIntent();
+        String fromCamera = null;
+        fromCamera = thisIntent.getStringExtra("pictureUri");
+
+        Log.d(ACTIVITY, "fromCamera = " + fromCamera);
+
+        if(fromCamera != null){
+            selectedImage = Uri.parse(fromCamera);
+            ImageView image = (ImageView)findViewById(R.id.picture);
+            image.setImageURI(selectedImage);
+        }
+
+        else {
+            Log.d(ACTIVITY, "Selecting photo");
+            Intent intent = new Intent(Intent.ACTION_PICK,
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(intent, REQUEST_IMAGE_LOAD);
+        }
 
         Button saveButton = (Button)findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {

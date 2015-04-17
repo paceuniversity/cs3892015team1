@@ -172,6 +172,10 @@ public class MainActivity extends Activity {
             if(resultCode == RESULT_OK && receivedIntent != null){
                 String message = getString(R.string.toast_picture_taken);
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                Uri uri = receivedIntent.getData();
+                Intent intent = new Intent(this, EditPhotoActivity.class);
+                intent.putExtra("pictureUri", uri.toString());
+                startActivity(intent);
             }
         }
     }

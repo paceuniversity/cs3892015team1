@@ -17,8 +17,6 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.whatsaround.whatsaround.com.whatsaround.whatsaround.dataType.PictureWord;
-
 import java.io.IOException;
 
 
