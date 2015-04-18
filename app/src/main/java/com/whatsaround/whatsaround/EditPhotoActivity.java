@@ -45,36 +45,38 @@ public class EditPhotoActivity extends Activity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         Log.d(ACTIVITY, "Selecting photo");
-        Intent intent = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, REQUEST_IMAGE_LOAD);
 
-        Button saveButton = (Button)findViewById(R.id.save_button);
+        Button saveButton = (Button) findViewById(R.id.save_button);
+
         saveButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                EditText text = (EditText)findViewById(R.id.word_association);
+
+                EditText text = (EditText) findViewById(R.id.word_association);
                 String word = text.getText().toString();
                 File dir = getExternalFilesDir(null);
                 File file = new File(dir, FILE_NAME);
+
                 try {
                     addPictureToFile(word, selectedImage, file);
-                }
-                catch(IOException e){
+                } catch (IOException e) {
+
                     Log.d(ACTIVITY, "There is no existing data, creating new file");
-                    try{
+
+                    try {
                         createFile(word, selectedImage, file);
-                    }
-                    catch (Exception e2){
+                    } catch (Exception e2) {
                         Log.d(ACTIVITY, "Cannot create file");
                         Toast.makeText(EditPhotoActivity.this, "Cannot create file", Toast.LENGTH_LONG).show();
                     }
-                }
-                catch(JSONException e){
+                } catch (JSONException e) {
                     Log.d(ACTIVITY, "Not a JSON object");
                 }
 
-                try{
+                try {
                     JSONArray data2 = readFile(file, 1);
 
                     StringBuffer dataBuffer = new StringBuffer();
@@ -84,12 +86,12 @@ public class EditPhotoActivity extends Activity {
                         dataBuffer.append(worded + "    " + uried + "\n");
                     }
 
-                    TextView tv = (TextView)findViewById(R.id.fileText);
+                    TextView tv = (TextView) findViewById(R.id.fileText);
                     tv.setText(dataBuffer.toString());
-                }
-                catch(Exception e){
+                } catch (Exception e) {
                     Log.d(ACTIVITY, "Error testing\n" + e.getMessage());
                 }
+
                 Toast.makeText(EditPhotoActivity.this, "Picture Saved", Toast.LENGTH_LONG).show();
                 finish();
             }
@@ -111,7 +113,7 @@ public class EditPhotoActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if(id == android.R.id.home){
+        if (id == android.R.id.home) {
             finish();
         }
 
@@ -127,7 +129,7 @@ public class EditPhotoActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == REQUEST_IMAGE_LOAD && resultCode == RESULT_OK){
+        if (requestCode == REQUEST_IMAGE_LOAD && resultCode == RESULT_OK) {
             selectedImage = data.getData();
             String text = data.getDataString();
             String[] filePath = {MediaStore.Images.Media.DATA};
@@ -137,7 +139,7 @@ public class EditPhotoActivity extends Activity {
             String picPath = cursor.getString(index);
             Log.d(ACTIVITY, "The location of the photo is: " + picPath);
             cursor.close();
-            ImageView image = (ImageView)findViewById(R.id.picture);
+            ImageView image = (ImageView) findViewById(R.id.picture);
             image.setImageBitmap(BitmapFactory.decodeFile(picPath));
         }
     }
@@ -156,7 +158,7 @@ public class EditPhotoActivity extends Activity {
     }
 
     public void createFile(String word, Uri uri, File file) throws JSONException, IOException {
-        if (!checkExternalStorage()){
+        if (!checkExternalStorage()) {
             return;
         }
 
@@ -206,7 +208,7 @@ public class EditPhotoActivity extends Activity {
     }
 
     public JSONArray addPicture(JSONArray data, String word, Uri uri) throws JSONException {
-        if (!checkExternalStorage()){
+        if (!checkExternalStorage()) {
             return data;
         }
 
@@ -215,24 +217,21 @@ public class EditPhotoActivity extends Activity {
             picture.put("word", word);
             picture.put("uri", uri);
             data.put(picture);
-        }
-        catch(JSONException e){
+        } catch (JSONException e) {
             Log.d(ACTIVITY, "Not a JSON object");
         }
 
         return data;
     }
 
-    public boolean checkExternalStorage(){
+    public boolean checkExternalStorage() {
         String state = Environment.getExternalStorageState();
 
-        if(state.equals(Environment.MEDIA_MOUNTED)){
+        if (state.equals(Environment.MEDIA_MOUNTED)) {
             return true;
-        }
-        else if(state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)){
+        } else if (state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
             Toast.makeText(this, "External Storage is read only", Toast.LENGTH_LONG).show();
-        }
-        else{
+        } else {
             Toast.makeText(this, "External Storage is not accessible", Toast.LENGTH_LONG).show();
         }
         return false;

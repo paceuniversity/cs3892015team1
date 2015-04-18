@@ -9,15 +9,13 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.whatsaround.whatsaround.com.whatsaround.whatsaround.dataType.PictureWord;
 
 import java.io.IOException;
 
@@ -29,6 +27,7 @@ public class PictureWordActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_picture_word);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -39,6 +38,7 @@ public class PictureWordActivity extends Activity {
         String path = getRealPathFromURI(uri);
 
         Log.d(ACTIVITY, "The location of the photo is: " + path);
+
         int orientation = getExifOrientation(path);
         Bitmap bitmap = BitmapFactory.decodeFile(path);
         int rotate;
