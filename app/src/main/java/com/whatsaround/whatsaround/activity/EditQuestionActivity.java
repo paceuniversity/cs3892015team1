@@ -25,6 +25,7 @@ public class EditQuestionActivity extends ActionBarActivity {
     public static final String LOG_KEY = EditQuestionActivity.class.getName();
 
     private static final int GALLERY_REQUEST_CODE = 2;
+    private static final int CAMERA_REQUEST_CODE = 1;
 
     private Question question;
 
@@ -124,6 +125,15 @@ public class EditQuestionActivity extends ActionBarActivity {
         startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
     }
 
+    public void goToCamera(View view){
+
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+
+    }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -154,6 +164,9 @@ public class EditQuestionActivity extends ActionBarActivity {
 
             imageView.setImageBitmap(BitmapFactory.decodeFile(newImagePath));
 
+
+        }else if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
+
         }
     }
 
@@ -175,7 +188,8 @@ public class EditQuestionActivity extends ActionBarActivity {
         if (!answerToBeSaved.matches("")) {
             question.setAnswer(answerView.getText().toString().trim());
         } else {
-            Toast.makeText(getApplicationContext(), "Couldn't update question. Answer not defined.", Toast.LENGTH_SHORT).show();
+            answerView.setError("Answer no defined");
+            //Toast.makeText(getApplicationContext(), "Couldn't update question. Answer not defined.", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -186,7 +200,7 @@ public class EditQuestionActivity extends ActionBarActivity {
         int updatedRows = questionDAO.update(question);
 
         if (updatedRows != 0) {
-            Toast.makeText(this, "Question  updated.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Question updated.", Toast.LENGTH_SHORT).show();
 
             Intent parentActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(parentActivityIntent);
@@ -217,7 +231,8 @@ public class EditQuestionActivity extends ActionBarActivity {
         if (!answerToBeSaved.matches("")) {
             question.setAnswer(answerView.getText().toString().trim());
         } else {
-            Toast.makeText(getApplicationContext(), "Couldn't save question. Answer not defined.", Toast.LENGTH_SHORT).show();
+            answerView.setError("Answer no defined");
+            //Toast.makeText(getApplicationContext(), "Couldn't save question. Answer not defined.", Toast.LENGTH_SHORT).show();
             return;
         }
 
