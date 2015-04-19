@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the theme applied to the application or activity -->
+
+    <style name="Theme.MyTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+        <!-- customize the color palette -->
+        <item name="colorPrimary">#64b5f6</item>
+        <item name="colorPrimaryDark">#1e88e5</item>
+        <item name="colorAccent">#fff</item>
+
+
+    </style>
+
+
+</resources>

@@ -12,8 +12,8 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <android:uses-permission
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
 
@@ -21,28 +21,37 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/Theme.MyTheme">
+
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:name=".activity.MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".ListPicturesActivity"
-            android:label="@string/title_activity_list_pictures" >
+            android:name=".activity.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.whatsaround.whatsaround.activity.MainActivity" />
         </activity>
+
         <activity
-            android:name=".EditPhotoActivity"
-            android:label="@string/title_activity_edit_photo" >
+            android:name=".activity.EditQuestionActivity"
+            android:label="@string/title_activity_edit_question"
+            android:parentActivityName=".activity.SettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.whatsaround.whatsaround.activity.SettingsActivity" />
         </activity>
-        <activity
-            android:name=".PictureWordActivity"
-            android:label="@string/title_activity_picture_word" >
-        </activity>
+
     </application>
 
 </manifest>
