@@ -17,7 +17,8 @@
         android:layout_margin="@dimen/abc_action_bar_icon_vertical_padding_material"
         android:gravity="center"
         android:textSize="50sp"
-        android:src="@drawable/chair"
+        android:src="@drawable/place_holder"
+
         />
 
 

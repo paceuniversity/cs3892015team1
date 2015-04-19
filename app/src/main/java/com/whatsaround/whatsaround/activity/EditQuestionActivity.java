@@ -24,7 +24,7 @@ public class EditQuestionActivity extends ActionBarActivity {
 
     public static final String LOG_KEY = EditQuestionActivity.class.getName();
 
-    private static final int RESULT_GALLERY_IMAGE = 2;
+    private static final int GALLERY_REQUEST_CODE = 2;
 
     private Question question;
 
@@ -47,22 +47,24 @@ public class EditQuestionActivity extends ActionBarActivity {
         questionDAO = QuestionDAO.getInstance(this);
 
 
-        //Get Image and answer from the item clicked on the list
+        //Try to get the "id" from the intent. If it is empty, it's not Edition Mode.
+        //In Edition Mode, the "id" is not empty, which means this Activity was called
+        //through clicking in one of the list items.
         String id = getIntent().getStringExtra(SettingsActivity.QUESTION_KEY);
-
-        if(id != null){
+        if (id != null) {
             question = questionDAO.getQuestonById(Integer.parseInt(id));
         }
 
-
         isEditionMode = question != null;
 
+
+        //Take the references of the image and answer view from the xml layout
         answerView = (EditText) findViewById(R.id.txt_edit_answer);
         imageView = (ImageView) findViewById(R.id.img_edit_image);
 
 
-        //If "question" is not null, the an item on the list was clicked and redirected to here.
-        //Therefore, take Views on this screen and assign the given Image and Answer (given in the Intent) as their texts
+        //If this activity was called in Edition Mode, hen an item on the list was clicked and redirected to here.
+        //Therefore, take Views on this screen and assign the given Image and Answer (given in the Intent) as their values.
         if (isEditionMode) {
 
 
@@ -74,8 +76,6 @@ public class EditQuestionActivity extends ActionBarActivity {
             }
 
         }
-
-
         //Otherwise, show the default Layout
 
 
@@ -90,13 +90,12 @@ public class EditQuestionActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
 
-        //noinspection SimplifiableIfStatement
+        //If the "save question" menu is clicked, verify: If the Activity is in Edition Mode, then edit question on the database.
+        //Otherwise, create another one in the database with the values given.
         if (id == R.id.mnu_save_question) {
 
 
@@ -122,7 +121,7 @@ public class EditQuestionActivity extends ActionBarActivity {
 
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-        startActivityForResult(galleryIntent, RESULT_GALLERY_IMAGE);
+        startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
     }
 
 
@@ -133,7 +132,7 @@ public class EditQuestionActivity extends ActionBarActivity {
 
         //If the Activity that returned the Intent was the gallery Activity,
         // take the picture passed and set to ImageView
-        if (requestCode == RESULT_GALLERY_IMAGE && resultCode == RESULT_OK && data != null) {
+        if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
 
             Uri selectedImage = data.getData();
 
@@ -151,7 +150,7 @@ public class EditQuestionActivity extends ActionBarActivity {
 
             cursor.close();
 
-            Toast.makeText(getApplicationContext(), newImagePath, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), newImagePath, Toast.LENGTH_LONG).show();
 
             imageView.setImageBitmap(BitmapFactory.decodeFile(newImagePath));
 
@@ -163,45 +162,81 @@ public class EditQuestionActivity extends ActionBarActivity {
 
     private void editQuestion() {
 
-        Toast.makeText(getApplicationContext(), "Answer: " + answerView.getText().toString(), Toast.LENGTH_LONG).show();
-        //Toast.makeText(getApplicationContext(), "Image: " + newImagePath, Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(), "ID: " + question.getId(), Toast.LENGTH_LONG).show();
-
-        question.setImage(question.getImage());
-
+        //If a new image was selected, change the image path in the object that is going to be updated in the database.
+        //Otherwise, let it the way it is.
         if (newImagePath != null) {
             question.setImage(newImagePath);
-
         }
 
 
-        question.setAnswer(answerView.getText().toString().trim());
+        //If no text was entered, don't continue saving and give a warning.
+        String answerToBeSaved = answerView.getText().toString().trim();
+
+        if (!answerToBeSaved.matches("")) {
+            question.setAnswer(answerView.getText().toString().trim());
+        } else {
+            Toast.makeText(getApplicationContext(), "Couldn't update question. Answer not defined.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
 
+        //Save on the database and receive the number of rows affected. If it's larger than zero,
+        //the question was saved. Then, give a success message and come back to the previous Activity.
+        //Otherwise, give an error message.
         int updatedRows = questionDAO.update(question);
 
         if (updatedRows != 0) {
-            Toast.makeText(this, "Question  updated.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Question  updated.", Toast.LENGTH_SHORT).show();
+
+            Intent parentActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(parentActivityIntent);
+
         } else {
-            Toast.makeText(this, "Couldn't update question. Please, try again.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Couldn't update question. Please, try again.", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void saveQuestion() {
 
+        //Create a new question that is going to store all the new information.
         question = new Question();
 
-        Toast.makeText(getApplicationContext(), "image: " + newImagePath, Toast.LENGTH_LONG).show();
 
-        question.setImage(newImagePath);
-        question.setAnswer(answerView.getText().toString().trim());
+        //If no image was chosen, don't continue saving and give a warning.
+        if (newImagePath != null) {
+            question.setImage(newImagePath);
+        } else {
+            Toast.makeText(getApplicationContext(), "Couldn't save question. Image not selected.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+
+        //If no text was entered, don't continue saving and give a warning.
+        String answerToBeSaved = answerView.getText().toString().trim();
+
+        if (!answerToBeSaved.matches("")) {
+            question.setAnswer(answerView.getText().toString().trim());
+        } else {
+            Toast.makeText(getApplicationContext(), "Couldn't save question. Answer not defined.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        //Save on the database and receive the number of rows affected. If it's larger than zero,
+        //the question was saved. Then, give a success message and come back to the previous Activity.
+        //Otherwise, give an error message.
         int rowsAffected = questionDAO.save(question);
 
         if (rowsAffected != 0) {
-            Toast.makeText(this, "Question saved.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Question saved.", Toast.LENGTH_SHORT).show();
+
+            Intent parentActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(parentActivityIntent);
+
         } else {
-            Toast.makeText(this, "Couldn't save question. Please, try again.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Couldn't save question. Please, try again.", Toast.LENGTH_SHORT).show();
         }
+
+
     }
 }
