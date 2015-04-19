@@ -1,0 +1,71 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.whatsaround.whatsaround.EditQuestionActivity"
+    >
+
+    <ImageView
+        android:id="@+id/img_edit_image"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="@dimen/abc_action_bar_icon_vertical_padding_material"
+        android:gravity="center"
+        android:textSize="50sp"
+        android:src="@drawable/chair"
+        />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img_edit_image"
+        android:orientation="horizontal"
+        android:layout_marginLeft="75dp"
+        android:layout_marginRight="75dp">
+
+        <ImageButton
+            android:id="@+id/btn_gallery"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="14dp"
+            android:layout_weight="1"
+            android:src="@drawable/button_library"
+            android:background="?attr/selectableItemBackground"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:text="Gallery"
+            android:onClick="goToGallery"/>
+
+
+        <ImageButton
+            android:id="@+id/btn_camera"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="14dp"
+            android:layout_weight="1"
+            android:src="@drawable/button_camera"
+            android:background="?attr/selectableItemBackground"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:text="Camera" />
+    </LinearLayout>
+
+
+    <EditText
+        android:id="@+id/txt_edit_answer"
+        android:layout_width="250dp"
+        android:textSize="20sp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img_edit_image"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="110dp"
+        android:gravity="center"
+        android:hint="Enter Right Answer" />
+
+</RelativeLayout>

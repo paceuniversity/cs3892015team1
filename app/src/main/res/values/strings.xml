@@ -1,12 +1,22 @@
 <resources>
     <string name="app_name">WhatsAround</string>
 
-    <string name="action_settings">Settings</string>
-    <string name="camera_button">Take Picture</string>
-    <string name="toast_picture_taken">Picture Taken</string>
-    <string name="title_activity_list_pictures">ListPicturesActivity</string>
+    <string name="action_save">Save</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="txt_app_name">WhatsAround</string>
+
+    <string-array name="questions">
+        <item>Table</item>
+        <item>Computer</item>
+        <item>Child</item>
+        <item>Chair</item>
+        <item>Baby</item>
+    </string-array>
+    <string name="title_activity_edit_question">Edit Question</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_edit_photo">EditPhotoActivity</string>
-    <string name="title_activity_picture_word">PictureWordActivity</string>
+    <string name="txt_add_question">Add Question</string>
+    <string name="txt_mnu_delete_question">Delete</string>
+    <string name="action_settings">Settings</string>
+
 </resources>
