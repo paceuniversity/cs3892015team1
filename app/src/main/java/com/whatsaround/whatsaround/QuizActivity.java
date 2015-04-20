@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class QuizActivity extends Activity {
@@ -175,31 +176,33 @@ public class QuizActivity extends Activity {
          */
         current++;
         // We'll set the current index back to the beginning if it is larger than the array
-        // Currently, we're only working with two items so we want to set this to be lower
-        if( current > 2)
+        if( current >= pictureList.size())
             current = 0;
-        // This is currently hardcoded for functionality purposes
-        // When finished, this method will randomly select which position the correct answer will be in
-        // It will also create three wrong choices to fill in the other positions
-        // The three wrong answers will be random mis-spellings of the word
-        // Hopefully those mis-spellings are plausible
         picture.setImageBitmap(questions[current].getPicture());
-        option1.setText(questions[current].getWord());
-        if( current == 0 ) {
-            option2.setText("Doug");
-            option3.setText("Doge");
-            option4.setText("Dawg");
+        // Sets up an array containing the correct answer and three incorrect answers
+        String[] options = {questions[current].getWord(), removeLetter(questions[current].getWord()),
+                removeLetter(questions[current].getWord()), removeLetter(questions[current].getWord())};
+        // Each array element will be swapped with a random array element
+        for(int i = 0; i < options.length; i++) {
+            String temp = options[i];
+            int swapped = new Random().nextInt(options.length);
+            options[i] = options[swapped];
+            options[swapped] = temp;
+
         }
-        if ( current == 1 ) {
-            option2.setText("Shuttel");
-            option3.setText("Shoddle");
-            option4.setText("Shovel");
-        }
-        if ( current == 2 ) {
-            option2.setText("Diner");
-            option3.setText("Donna");
-            option4.setText("Dinnah");
-        }
+        // Each option is set to the corresponding array element
+        option1.setText(options[0]);
+        option2.setText(options[1]);
+        option3.setText(options[2]);
+        option4.setText(options[3]);
+    }
+
+    // Removes a random string from the first letter that's not the first letter
+    // This may be improvable in the future to simulate really good child spelling errors
+    private String removeLetter(String word) {
+        StringBuilder sb = new StringBuilder(word);
+        sb.deleteCharAt( new Random().nextInt(word.length()-1) + 1 );
+        return sb.toString();
     }
 
     public JSONArray readFile(File file, int test) throws IOException, JSONException {
