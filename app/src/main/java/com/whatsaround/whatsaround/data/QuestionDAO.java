@@ -87,7 +87,7 @@ public class QuestionDAO {
         return (int) updatedRows;
     }
 
-    public void delete(Question question) {
+    public int delete(Question question) {
 
         //It creates an array with the IDs of the objects that are going to be changed in the table
         //In this case, it just contains the id of the object Question passed.
@@ -95,8 +95,9 @@ public class QuestionDAO {
                 String.valueOf(question.getId())
         };
 
-        database.delete(QuestionsContract.TABLE_NAME, QuestionsContract.Columns.ID + " = ?", questionID);
+        long rowAffected = database.delete(QuestionsContract.TABLE_NAME, QuestionsContract.Columns.ID + " = ?", questionID);
 
+        return (int) rowAffected;
     }
 
 

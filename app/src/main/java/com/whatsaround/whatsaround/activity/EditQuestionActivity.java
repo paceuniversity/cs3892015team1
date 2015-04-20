@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -18,6 +20,11 @@ import android.widget.Toast;
 import com.whatsaround.whatsaround.data.QuestionDAO;
 import com.whatsaround.whatsaround.model.Question;
 import com.whatsaround.whatsaround.R;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class EditQuestionActivity extends ActionBarActivity {
@@ -38,6 +45,8 @@ public class EditQuestionActivity extends ActionBarActivity {
     private ImageView imageView;
 
     private String newImagePath;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,11 +108,9 @@ public class EditQuestionActivity extends ActionBarActivity {
         //Otherwise, create another one in the database with the values given.
         if (id == R.id.mnu_save_question) {
 
-
             if (isEditionMode) {
 
                 editQuestion();
-
 
             } else {
 
@@ -125,14 +132,61 @@ public class EditQuestionActivity extends ActionBarActivity {
         startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
     }
 
-    public void goToCamera(View view){
+    public void goToCamera(View view) {
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
+
+
+        // this part to save captured image on provided path
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//
+//        String imageFileName = "WhatsAround_" + timeStamp + "_";
+//        File file = new File(Environment.getExternalStorageDirectory(),imageFileName + ".png");
+//
+//        file.getPath();
+//
+//        Uri photoPath = Uri.fromFile(file);
+//        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoPath);
+//
+//        // start camera activity
         startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
 
-    }
 
+
+
+
+
+//        // Create the File where the photo should go
+//        File imageFile = null;
+//        try {
+//
+//            imageFile = createFileToStoreImage();
+//
+//        } catch (IOException ex) {
+//
+//            Toast.makeText(getApplicationContext(), "Error when creating image file", Toast.LENGTH_SHORT).show();
+//            Log.e("ERRRRROR: ", ex.getMessage());
+//        }
+//
+//
+//        // Continue only if the File was successfully created
+//        if (imageFile != null) {
+//
+//            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
+//            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+//        }
+
+
+       /* Uri fileUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);  // create a file to save the video
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);  // set the image file name
+
+        cameraIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1); // set the video
+
+
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, )*/
+
+    }
 
 
     @Override
@@ -160,12 +214,12 @@ public class EditQuestionActivity extends ActionBarActivity {
 
             cursor.close();
 
-            //Toast.makeText(getApplicationContext(), newImagePath, Toast.LENGTH_LONG).show();
-
             imageView.setImageBitmap(BitmapFactory.decodeFile(newImagePath));
 
 
-        }else if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
+        } else if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
+
+            imageView.setImageBitmap(BitmapFactory.decodeFile(newImagePath));
 
         }
     }
@@ -252,6 +306,29 @@ public class EditQuestionActivity extends ActionBarActivity {
             Toast.makeText(this, "Couldn't save question. Please, try again.", Toast.LENGTH_SHORT).show();
         }
 
-
     }
+
+    //---------------------------------------------------------------------------
+
+//    private File createFileToStoreImage() throws IOException {
+//
+//        // Create an image file name
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//
+//        String imageFileName = "WhatsAround_" + timeStamp + "_";
+//
+//        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+//
+//        File image = File.createTempFile(
+//                imageFileName,  /* prefix */
+//                ".jpg",         /* suffix */
+//                storageDir      /* directory */
+//        );
+//
+//        // Save a file: path for use with ACTION_VIEW intents
+//        newImagePath = "file:" + image.getAbsolutePath();
+//        return image;
+//    }
+
+
 }

@@ -10,4 +10,13 @@
         android:layout_height="match_parent"
         android:choiceMode="singleChoice" />
 
+    <TextView
+        android:id="@+id/txt_empty_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="26sp"
+        android:text="@string/txt_empty_list_message"
+        android:gravity="center"
+        android:visibility="gone" />
+
 </LinearLayout>

@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.whatsaround.whatsaround.adapter.QuestionsAdapter;
 import com.whatsaround.whatsaround.data.QuestionDAO;
@@ -41,6 +42,8 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     private ListView questionsListView;
     private List<Question> questionsSelected = new ArrayList<>();
     private List<Question> questionsListed;
+    private QuestionDAO questionDAO;
+    private TextView emptyListText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,16 +51,16 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
 
         setContentView(R.layout.activity_settings);
 
-        questionsListed = QuestionDAO.getInstance(this).list();
+        questionDAO = QuestionDAO.getInstance(this);
 
-        adapter = new QuestionsAdapter(this, questionsListed);
+        questionsListed = questionDAO.list();
 
-
+        emptyListText = (TextView) findViewById(R.id.txt_empty_list);
         /* Take the listView (which is referenced inside the layout file of this Activity
         and pass the list of questions to it through the adapter.
         Also make it handle clicks*/
         questionsListView = (ListView) findViewById(R.id.activity_settings_list);
-        questionsListView.setAdapter(adapter);
+        updateList(questionsListed);
         questionsListView.setOnItemClickListener(this);
 
 
@@ -78,7 +81,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
         //Create Intent and pass the values of the Views (answer and image) to the EditQuestionActivity
         Intent intent = new Intent(getApplicationContext(), EditQuestionActivity.class);
 
-       // Question question = new Question((int) id, imageView.getText().toString(), answerView.getText().toString());
+        // Question question = new Question((int) id, imageView.getText().toString(), answerView.getText().toString());
 
         intent.putExtra(QUESTION_KEY, String.valueOf(id));
 
@@ -170,6 +173,22 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
 
     }
 
+    private void updateList(List<Question> list) {
+
+
+        if (list.isEmpty()) {
+            questionsListView.setVisibility(View.GONE);
+            emptyListText.setVisibility(View.VISIBLE);
+        }else{
+            emptyListText.setVisibility(View.GONE);
+            questionsListView.setVisibility(View.VISIBLE);
+
+            adapter = new QuestionsAdapter(this, list);
+            questionsListView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
 
     //--------------------- Dialog for Deletion ----------------------------
 
@@ -179,14 +198,28 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
 
+        int deletedRows = 0;
+        int questionsDeleted = 0;
+
         //Delete selected Items
         for (Question question : questionsSelected) {
 
-            //!!!!!!!!!!!!!!! CHANGE to delete on database
-            questionsListed.remove(question);
+            deletedRows = questionDAO.delete(question);
+            questionsDeleted++;
         }
 
-        clearQuestionsSelected();
+        if (deletedRows > 0) {
+            clearQuestionsSelected();
+
+            updateList(questionDAO.list());
+
+            Toast.makeText(getApplicationContext(), "Deleted Questions: " + questionsDeleted, Toast.LENGTH_SHORT).show();
+
+        } else {
+
+            Toast.makeText(getApplicationContext(), "Error deleting questions.", Toast.LENGTH_SHORT).show();
+        }
+
 
     }
 
@@ -221,7 +254,6 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
 
         questionsSelected.clear();
 
-        adapter.notifyDataSetChanged();
     }
 
 

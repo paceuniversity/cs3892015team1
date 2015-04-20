@@ -29,6 +29,7 @@ public class QuestionsAdapter extends BaseAdapter {
         this.questions = questions;
         this.inflater = LayoutInflater.from(context);
 
+
     }
 
 
