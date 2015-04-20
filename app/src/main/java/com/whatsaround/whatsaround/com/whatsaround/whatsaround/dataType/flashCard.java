@@ -30,6 +30,13 @@ public class flashCard {
         return word;
     }
 
+    public boolean checkCorrect(String word) {
+        if( word == this.word )
+            return true;
+        else
+            return false;
+    }
+
     @Override
     public String toString() {
         return word;
