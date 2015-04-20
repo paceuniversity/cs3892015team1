@@ -31,6 +31,7 @@ public class flashCard {
     }
 
     public boolean checkCorrect(String word) {
+        // Returns true if the selected word is the word attributed to this flashCard
         if( word == this.word )
             return true;
         else
