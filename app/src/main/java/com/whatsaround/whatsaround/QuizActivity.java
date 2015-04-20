@@ -2,12 +2,18 @@ package com.whatsaround.whatsaround;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,11 +25,22 @@ import android.widget.Toast;
 
 import com.whatsaround.whatsaround.com.whatsaround.whatsaround.dataType.flashCard;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+
 
 public class QuizActivity extends Activity {
     // Define some global variables that we're gonna work with
     Context context = this;
-    String QUIZ_ACTIVITY = "QuizActivity";
+    private final String QUIZ_ACTIVITY = "QuizActivity";
+    private final String FILE_NAME = "WAData";
+
     int current = -1;
     int score = 0;
     flashCard[] questions = new flashCard[5];
@@ -31,25 +48,64 @@ public class QuizActivity extends Activity {
     ImageView picture;
     Button option1, option2, option3, option4;
 
+    // Declare two array lists to store our words and URIs
+    ArrayList<String> wordList = new ArrayList<String>();
+    ArrayList<String> pictureList = new ArrayList<String>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
-        // Since we're currently using placeholders from the drawable resources we have to do the bitmap stuff on it
-        // This will pull questions from the JSON object/Database and then set array elements accordingly
-        Drawable myDrawable = getResources().getDrawable(R.drawable.chair);
-        Bitmap icon = ((BitmapDrawable) myDrawable).getBitmap();
+        // Copy pasted from the CustomAdapter
+        // This will read the JSON input and add the word/uri to the appropriate ArrayList
+        File dir = getExternalFilesDir(null);
+        File file = new File(dir, FILE_NAME);
 
-        Drawable myDrawable2 = getResources().getDrawable(R.drawable.table);
-        Bitmap icon2 = ((BitmapDrawable) myDrawable2).getBitmap();
+        try {
+            JSONArray json = readFile(file,1);
 
-        Drawable myDrawable3 = getResources().getDrawable(R.drawable.jupiter);
-        Bitmap icon3 = ((BitmapDrawable) myDrawable3).getBitmap();
-        // This is an array that will hold all the questions we have
-        questions[0] = new flashCard("Chair", icon);
-        questions[1] = new flashCard("Table", icon2);
-        questions[2] = new flashCard("Jupiter", icon3);
+            for (int i = 0; i < json.length(); i++)
+            {
+                // Declare and initialize so the compiler doesn't complain
+                String word = "", uri = "";
+                // We'll check to see if the current JSONObject has the "word" attribute
+                // If it doesn't, we'll ignore any "uri" or "word" attribute
+                if( json.getJSONObject(i).has("word") ) {
+                    uri = json.getJSONObject(i).getString("uri");
+                }
+                if( json.getJSONObject(i).has("word") ) {
+                    word = json.getJSONObject(i).getString("word");
+                }
+                Log.d(QUIZ_ACTIVITY, word);
+                // image.setImageBitmap(BitmapFactory.decodeFile(uri));
+                // We make sure the JSONObject has a set "word" attribute, a set "uri" attribute, and is not something like "android.widget.EditText..."
+                // I had a few instances of the last case and it made things very odd
+                if  (!json.getJSONObject(i).isNull("word") && !json.getJSONObject(i).isNull("uri") &&
+                        !json.getJSONObject(i).getString("word").matches("android.widget.EditText@(.*)") ) {
+                    // Add both the word and uri to their corresponding ArrayLists
+                    Log.d(QUIZ_ACTIVITY, "The word is: " + word);
+                    wordList.add(word);
+                    Log.d(QUIZ_ACTIVITY, "The uri is: " + uri);
+                    pictureList.add(uri);
+                }
+            }
+
+            //listItems.add(String.valueOf(readFile(file,1)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // This will set the picture and word for every item in the ArrayList
+        for (int i = 0; i < pictureList.size(); i++) {
+            String path = getRealPathFromURI(Uri.parse(pictureList.get(i)));
+            //Bitmap bitmap = BitmapFactory.decodeFile(path);
+            int orientation = getExifOrientation(path);
+            Bitmap bitmap = decodeSampledBitmapFromResource(path, 100, 100);
+            questions[i] = new flashCard(wordList.get(i), bitmap);
+        }
 
         // Create variables for our views
         picture = (ImageView)findViewById(R.id.picture);
@@ -130,20 +186,112 @@ public class QuizActivity extends Activity {
         picture.setImageBitmap(questions[current].getPicture());
         option1.setText(questions[current].getWord());
         if( current == 0 ) {
-            option2.setText("Char");
-            option3.setText("Chir");
-            option4.setText("Chur");
+            option2.setText("Doug");
+            option3.setText("Doge");
+            option4.setText("Dawg");
         }
         if ( current == 1 ) {
-            option2.setText("Tayble");
-            option3.setText("Tabel");
-            option4.setText("Teybel");
+            option2.setText("Shuttel");
+            option3.setText("Shoddle");
+            option4.setText("Shovel");
         }
         if ( current == 2 ) {
-            option2.setText("Joopiter");
-            option3.setText("Jewpiter");
-            option4.setText("Djupiter");
+            option2.setText("Diner");
+            option3.setText("Donna");
+            option4.setText("Dinnah");
         }
+    }
+
+    public JSONArray readFile(File file, int test) throws IOException, JSONException {
+        FileInputStream fis = new FileInputStream(file);
+        BufferedInputStream bis = new BufferedInputStream(fis);
+        StringBuffer b = new StringBuffer();
+        while (bis.available() != 0) {
+            char c = (char) bis.read();
+            b.append(c);
+        }
+        bis.close();
+        fis.close();
+
+        JSONArray tester = new JSONArray(b.toString());
+        return tester;
+    }
+
+    // CREATE A CLASS FOR THE ROTATE/RESIZE METHODS SINCE LIKE THREE CLASSES DEFINE THEM
+
+    private String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(this.context, contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
+    }
+
+    private int getExifOrientation(String filepath) {// YOUR MEDIA PATH AS STRING
+        int degree = 0;
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(filepath);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        if (exif != null) {
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
+            if (orientation != -1) {
+                switch (orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        degree = 90;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        degree = 180;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        degree = 270;
+                        break;
+                }
+
+            }
+        }
+        return degree;
+    }
+
+    private static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
+    private static Bitmap decodeSampledBitmapFromResource(String uri, int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(uri, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(uri, options);
     }
 
 
