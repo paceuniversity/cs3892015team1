@@ -70,6 +70,16 @@ public class MainActivity extends Activity {
             }
         });
 
+        Button takeQuizButton = (Button)findViewById(R.id.button_take_quiz);
+        takeQuizButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(MAIN_ACTIVITY, "onclick for seeFilesButton");
+                Intent intent = new Intent(MainActivity.this, QuizActivity.class);
+                startActivity(intent);
+            }
+        });
+
 //        createDirectory();
 //        try {
 //            createFile();

@@ -33,6 +33,14 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/button_add_photo"/>
 
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Take Quiz"
+        android:id="@+id/button_take_quiz"
+        android:layout_below="@id/camera_button"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

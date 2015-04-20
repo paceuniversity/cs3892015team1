@@ -10,6 +10,12 @@ public class flashCard {
     private Bitmap picture;
     private String word;
 
+    // Gotta have a constructor
+    public flashCard(String word, Bitmap picture) {
+        this.picture = picture;
+        this.word = word;
+    }
+
     public void setPicture(Bitmap picture) { this.picture = picture; }
 
     public Bitmap getPicture() {
