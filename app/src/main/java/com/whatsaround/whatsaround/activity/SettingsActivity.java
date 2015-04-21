@@ -26,6 +26,7 @@ import com.whatsaround.whatsaround.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 public class SettingsActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, AbsListView.MultiChoiceModeListener, DeletionDialog.DeletionDialogListener {
@@ -33,10 +34,11 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     public static final String QUESTION_KEY = "question";
     private QuestionsAdapter adapter;
     private ListView questionsListView;
-    private List<Question> questionsSelected = new ArrayList<>();
+    //private List<Question> questionsSelected = new ArrayList<>();
     private List<Question> questionsListed;
     private QuestionDAO questionDAO;
     private TextView emptyListText;
+    private int numberOfQuestionsSelected = 0;
 
 
     @Override
@@ -48,6 +50,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
         questionDAO = QuestionDAO.getInstance(this);
 
         questionsListed = questionDAO.list();
+
 
         emptyListText = (TextView) findViewById(R.id.txt_empty_list);
         /* Take the listView (which is referenced inside the layout file of this Activity
@@ -115,17 +118,24 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
 
         //When some item receives a long click, add it to the list of questions selected and make its background blue.
         //Otherwise, delete it from the list of questions selected and make its color be the same as the list's color.
-        Question questionSelected = (Question) adapter.getItem(position);
-        View question = questionsListView.getChildAt(position);
+
+        //Question questionSelected = (Question) adapter.getItem(position);
+        //View question = questionsListView.getChildAt(position);
 
         if (checked) {
-            questionsSelected.add(questionSelected);
-            question.setBackgroundColor(Color.parseColor("#BBDEFB"));
+
+            numberOfQuestionsSelected++;
+            adapter.setNewSelection(position, checked);
+           // questionsSelected.add(questionSelected);
+            //question.setBackgroundColor(Color.parseColor("#BBDEFB"));
         } else {
-            questionsSelected.remove(questionSelected);
-            question.setBackgroundColor(Color.TRANSPARENT);
+            numberOfQuestionsSelected--;
+            adapter.removeSelection(position);
+            //questionsSelected.remove(questionSelected);
+            //question.setBackgroundColor(Color.TRANSPARENT);
         }
 
+        mode.setTitle(numberOfQuestionsSelected + " selected");
     }
 
 
@@ -133,6 +143,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         //Make the deletion menu appear
+        numberOfQuestionsSelected = 0;
         getMenuInflater().inflate(R.menu.menu_settings_list_deletion, menu);
 
         return true;
@@ -146,20 +157,20 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 
-
         //If the button of deletion is clicked, take all the items selected and delete them.
         //Then, finish the "Deletion Menu"
         if (item.getItemId() == R.id.mnu_delete_question) {
 
 
             //Create Dialog for the user to confirm or not the deletion of the item(s)
-            DeletionDialog deletionDialog = new DeletionDialog();
+            DeletionDialog deletionDialog = DeletionDialog.newInstance(adapter.getPositionsOfSelectedQuestions(),this);
             deletionDialog.show(getFragmentManager(), "Settings Activity");
 
 
             mode.finish();
             return true;
         }
+
 
         return false;
 
@@ -170,7 +181,8 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     @Override
     public void onDestroyActionMode(ActionMode mode) {
 
-        //clearQuestionsSelected();
+        adapter.clearEntireSelection();
+
 
     }
 
@@ -181,37 +193,31 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     * When "Yes" Button clicked, delete the items selected
     * */
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
+    public void onDialogPositiveClick(Set<Integer> questionsSelected) {
 
         int deletedRows = 0;
-        int questionsDeleted = 0;
 
         //Delete selected Items
-        for (Question question : questionsSelected) {
+        for (Integer questionId : questionsSelected) {
+
+            Question question = (Question) adapter.getItem(questionId);
 
             deletedRows = questionDAO.delete(question);
-            questionsDeleted++;
         }
 
         if (deletedRows > 0) {
-            clearQuestionsSelected();
+
+            adapter.clearEntireSelection();
 
             updateList(questionDAO.list());
 
-            Toast.makeText(getApplicationContext(), "Deleted Questions: " + questionsDeleted, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Deleted Questions: " + numberOfQuestionsSelected, Toast.LENGTH_SHORT).show();
 
         } else {
 
             Toast.makeText(getApplicationContext(), "Error deleting questions.", Toast.LENGTH_SHORT).show();
         }
 
-
-    }
-
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
-
-        clearQuestionsSelected();
 
     }
 
@@ -224,22 +230,22 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     * Then make the list of selected questions empty.
     * At last, notify the changes to the adapter
     * */
-    private void clearQuestionsSelected() {
-
-
-        int count = questionsListView.getChildCount();
-
-
-        for (int i = 0; i < count; i++) {
-
-            View questionView = questionsListView.getChildAt(i);
-            questionView.setBackgroundColor(Color.TRANSPARENT);
-
-        }
-
-        questionsSelected.clear();
-
-    }
+//    private void clearQuestionsSelected() {
+//
+//
+//        int count = questionsListView.getChildCount();
+//
+//
+//        for (int i = 0; i < count; i++) {
+//
+//            View questionView = questionsListView.getChildAt(i);
+//            questionView.setBackgroundColor(Color.TRANSPARENT);
+//
+//        }
+//
+//        questionsSelected.clear();
+//
+//    }
 
 
     private void updateList(List<Question> list) {

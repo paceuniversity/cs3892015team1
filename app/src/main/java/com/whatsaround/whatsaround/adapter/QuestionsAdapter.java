@@ -3,6 +3,7 @@ package com.whatsaround.whatsaround.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +16,9 @@ import com.whatsaround.whatsaround.R;
 import com.whatsaround.whatsaround.model.Question;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 
 //Android will call its methods when creating the list in the Activity that reference this adapter
@@ -24,8 +27,9 @@ public class QuestionsAdapter extends BaseAdapter {
 
     private List<Question> questions;
     private LayoutInflater inflater;
+    private HashMap<Integer, Boolean> questionsSelected = new HashMap<>();
 
-
+    
     public QuestionsAdapter(Context context, List<Question> questions) {
 
         this.questions = questions;
@@ -33,6 +37,47 @@ public class QuestionsAdapter extends BaseAdapter {
 
 
     }
+
+
+    public void setNewSelection(int position, boolean isSelected) {
+
+        questionsSelected.put(position, isSelected);
+        notifyDataSetChanged();
+
+    }
+
+
+    public boolean isQuestionSelected(int questionPosition) {
+
+        Boolean result = questionsSelected.get(questionPosition);
+        return result == null ? false : result;
+
+    }
+
+
+    public Set<Integer> getPositionsOfSelectedQuestions() {
+
+        return questionsSelected.keySet();
+
+    }
+
+
+    public void removeSelection(int position) {
+
+        questionsSelected.remove(position);
+        notifyDataSetChanged();
+
+    }
+
+
+    public void clearEntireSelection() {
+
+        questionsSelected = new HashMap<>();
+        notifyDataSetChanged();
+        
+    }
+    
+    
 
 
     @Override
@@ -64,19 +109,18 @@ public class QuestionsAdapter extends BaseAdapter {
 
 
         Question question = null;
-        if(!questions.isEmpty()){
+        if (!questions.isEmpty()) {
             question = questions.get(position);
             Log.e("EEEEEEE", String.valueOf(questions.size()));
             Log.e("EEEEEEE", question.getAnswer());
         }
 
 
-        if(question==null){
+        if (question == null) {
             Log.e("EEEEEEE", String.valueOf(position));
-        }else{
+        } else {
             Log.e("EEEEEEE", "question not null");
         }
-
 
 
         //If Android did not pass a View (through convertView) that can be recycled, create (inflate) a new one
@@ -104,11 +148,13 @@ public class QuestionsAdapter extends BaseAdapter {
         }
 
 
+
+
         if (question != null) {
 
             //Resize image, if it exists
 
-            if(new File(question.getImage()).exists()){
+            if (new File(question.getImage()).exists()) {
 
                 Bitmap imageInNormalSize = BitmapFactory.decodeFile(question.getImage());
                 Bitmap imageResized = Bitmap.createScaledBitmap(imageInNormalSize, 90, 90, false);
@@ -119,7 +165,7 @@ public class QuestionsAdapter extends BaseAdapter {
                 }
                 viewQuestionHolder.textAnswer.setText(question.getAnswer());
 
-            }else{
+            } else {
 
                 Log.e("EEEEEEE", "Image not found");
 
@@ -128,7 +174,14 @@ public class QuestionsAdapter extends BaseAdapter {
             }
 
 
+        }
 
+
+
+        if (questionsSelected.get(position) != null) {
+            view.setBackgroundColor(Color.parseColor("#BBDEFB"));
+        }else{
+            view.setBackgroundColor(Color.TRANSPARENT);
         }
 
 

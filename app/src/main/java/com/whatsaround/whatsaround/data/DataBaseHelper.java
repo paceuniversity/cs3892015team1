@@ -10,7 +10,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "whats_around_db";
 
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
 
     private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + QuestionsContract.TABLE_NAME;
     private static final String SQL_CREATE_TABLE =
