@@ -3,10 +3,10 @@ package com.whatsaround.whatsaround.activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -17,12 +17,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.whatsaround.whatsaround.R;
 import com.whatsaround.whatsaround.data.QuestionDAO;
 import com.whatsaround.whatsaround.model.Question;
-import com.whatsaround.whatsaround.R;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -45,7 +44,6 @@ public class EditQuestionActivity extends ActionBarActivity {
     private ImageView imageView;
 
     private String newImagePath;
-
 
 
     @Override
@@ -73,8 +71,8 @@ public class EditQuestionActivity extends ActionBarActivity {
         imageView = (ImageView) findViewById(R.id.img_edit_image);
 
 
-        //If this activity was called in Edition Mode, hen an item on the list was clicked and redirected to here.
-        //Therefore, take Views on this screen and assign the given Image and Answer (given in the Intent) as their values.
+        //If this activity was called in Edition Mode, then an item on the list was clicked and redirected to here.
+        //Therefore, take Views on this screen and assign the Image and Answer (given in the Intent) as their values.
         if (isEditionMode) {
 
 
@@ -134,57 +132,52 @@ public class EditQuestionActivity extends ActionBarActivity {
 
     public void goToCamera(View view) {
 
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        //If External storage is available, create a new file and pass it to the camera Intent, which will use this file
+        //to save on it the picture taken.
+        if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
+
+            //If the folder "WhatsAround" doesn't already exist on the public Picture folder, create it.
+            File imagesFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/WhatsAround");
+
+            if (!imagesFolder.exists()) {
 
 
+                boolean successOnCreatingFolder = imagesFolder.mkdirs();
 
-        // this part to save captured image on provided path
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//
-//        String imageFileName = "WhatsAround_" + timeStamp + "_";
-//        File file = new File(Environment.getExternalStorageDirectory(),imageFileName + ".png");
-//
-//        file.getPath();
-//
-//        Uri photoPath = Uri.fromFile(file);
-//        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoPath);
-//
-//        // start camera activity
-        startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+                if (!successOnCreatingFolder) {
+                    Toast.makeText(getApplicationContext(), "Error when creating the image file.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
 
 
+            //To create different file names, take the current time and add it to the name of the file
+            String currentTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String imageFileName = "WhatsAround_" + currentTime + "_";
 
 
+            //Create a new file on the "WhatsAround" folder and tell our application
+            //that this is the path for the image added in a new question.
+            File imageFile = new File(imagesFolder, imageFileName + ".jpg");
+            newImagePath = imageFile.getPath();
 
 
-//        // Create the File where the photo should go
-//        File imageFile = null;
-//        try {
-//
-//            imageFile = createFileToStoreImage();
-//
-//        } catch (IOException ex) {
-//
-//            Toast.makeText(getApplicationContext(), "Error when creating image file", Toast.LENGTH_SHORT).show();
-//            Log.e("ERRRRROR: ", ex.getMessage());
-//        }
-//
-//
-//        // Continue only if the File was successfully created
-//        if (imageFile != null) {
-//
-//            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
-//            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
-//        }
+            //Create a Intent to call the camera.
+            //Give the file created to a camera Intent to take a picture and save it on this file.
+            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            Uri photoPathUri = Uri.fromFile(imageFile);
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoPathUri);
 
 
-       /* Uri fileUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);  // create a file to save the video
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);  // set the image file name
-
-        cameraIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1); // set the video
+            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
 
 
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, )*/
+        } else {
+
+            Toast.makeText(getApplicationContext(), "Unable to proceed. SD Card not available.", Toast.LENGTH_SHORT).show();
+
+        }
 
     }
 
@@ -198,27 +191,50 @@ public class EditQuestionActivity extends ActionBarActivity {
         // take the picture passed and set to ImageView
         if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
 
+
             Uri selectedImage = data.getData();
 
-            String[] filePath = {
+            String[] galleryFolderPath = {
                     MediaStore.Images.Media.DATA
             };
 
-            Cursor cursor = getContentResolver().query(selectedImage, filePath, null, null, null);
+
+            //Make a query (through a cursor) to the gallery directory asking for the selectedImage
+            Cursor cursor = getContentResolver().query(selectedImage, galleryFolderPath, null, null, null);
             cursor.moveToFirst();
 
-            int columnIndex = cursor.getColumnIndex(filePath[0]);
+            int columnIndex = cursor.getColumnIndex(galleryFolderPath[0]);
 
+
+            //Set the newImagePath of the question as the path of the image retrieved from the gallery
             newImagePath = cursor.getString(columnIndex);
 
 
             cursor.close();
 
+
+            //Set image taken from the gallery and put on imageView
             imageView.setImageBitmap(BitmapFactory.decodeFile(newImagePath));
 
 
         } else if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
 
+
+            //Tell Android to update the gallery with the picture that the camera has taken.
+            //If we don't do that and we open the gallery without turning off the phone,
+            //the picture be shown there, besides being stored on a public directory.
+            MediaScannerConnection.scanFile(getApplicationContext(), new String[]{newImagePath},
+                    null, new MediaScannerConnection.OnScanCompletedListener() {
+
+                        @Override
+                        public void onScanCompleted(String path, Uri uri) {
+                            //Don't need to do nothing after notifying android about changes.
+
+                        }
+                    });
+
+
+            //Put image received from the camera in the imageView
             imageView.setImageBitmap(BitmapFactory.decodeFile(newImagePath));
 
         }
@@ -307,28 +323,6 @@ public class EditQuestionActivity extends ActionBarActivity {
         }
 
     }
-
-    //---------------------------------------------------------------------------
-
-//    private File createFileToStoreImage() throws IOException {
-//
-//        // Create an image file name
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//
-//        String imageFileName = "WhatsAround_" + timeStamp + "_";
-//
-//        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-//
-//        File image = File.createTempFile(
-//                imageFileName,  /* prefix */
-//                ".jpg",         /* suffix */
-//                storageDir      /* directory */
-//        );
-//
-//        // Save a file: path for use with ACTION_VIEW intents
-//        newImagePath = "file:" + image.getAbsolutePath();
-//        return image;
-//    }
 
 
 }

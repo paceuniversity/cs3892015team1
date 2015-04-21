@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.ActionMode;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,15 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
-
-/*
-* CHANGES TO MAKE:
-*
-* List Thumbnails besides the answers
-* Delete and retrieve data from the database
-* */
-
 public class SettingsActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, AbsListView.MultiChoiceModeListener, DeletionDialog.DeletionDialogListener {
 
     public static final String QUESTION_KEY = "question";
@@ -44,6 +37,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     private List<Question> questionsListed;
     private QuestionDAO questionDAO;
     private TextView emptyListText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +134,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         //Make the deletion menu appear
         getMenuInflater().inflate(R.menu.menu_settings_list_deletion, menu);
+
         return true;
     }
 
@@ -150,6 +145,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
 
         //If the button of deletion is clicked, take all the items selected and delete them.
         //Then, finish the "Deletion Menu"
@@ -164,29 +160,18 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
             mode.finish();
             return true;
         }
+
         return false;
+
+
     }
+
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
 
+        //clearQuestionsSelected();
 
-    }
-
-    private void updateList(List<Question> list) {
-
-
-        if (list.isEmpty()) {
-            questionsListView.setVisibility(View.GONE);
-            emptyListText.setVisibility(View.VISIBLE);
-        }else{
-            emptyListText.setVisibility(View.GONE);
-            questionsListView.setVisibility(View.VISIBLE);
-
-            adapter = new QuestionsAdapter(this, list);
-            questionsListView.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
-        }
     }
 
 
@@ -254,6 +239,23 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
 
         questionsSelected.clear();
 
+    }
+
+
+    private void updateList(List<Question> list) {
+
+
+        if (list.isEmpty()) {
+            questionsListView.setVisibility(View.GONE);
+            emptyListText.setVisibility(View.VISIBLE);
+        } else {
+            emptyListText.setVisibility(View.GONE);
+            questionsListView.setVisibility(View.VISIBLE);
+
+            adapter = new QuestionsAdapter(this, list);
+            questionsListView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
     }
 
 

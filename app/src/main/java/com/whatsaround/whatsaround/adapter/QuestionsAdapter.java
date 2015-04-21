@@ -3,6 +3,7 @@ package com.whatsaround.whatsaround.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.whatsaround.whatsaround.R;
 import com.whatsaround.whatsaround.model.Question;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -61,7 +63,20 @@ public class QuestionsAdapter extends BaseAdapter {
         ViewQuestionHolder viewQuestionHolder;
 
 
-        Question question = questions.get(position);
+        Question question = null;
+        if(!questions.isEmpty()){
+            question = questions.get(position);
+            Log.e("EEEEEEE", String.valueOf(questions.size()));
+            Log.e("EEEEEEE", question.getAnswer());
+        }
+
+
+        if(question==null){
+            Log.e("EEEEEEE", String.valueOf(position));
+        }else{
+            Log.e("EEEEEEE", "question not null");
+        }
+
 
 
         //If Android did not pass a View (through convertView) that can be recycled, create (inflate) a new one
@@ -89,16 +104,32 @@ public class QuestionsAdapter extends BaseAdapter {
         }
 
 
-        //Resize image
-        Bitmap imageInNormalSize = BitmapFactory.decodeFile(question.getImage());
-        Bitmap imageResized = Bitmap.createScaledBitmap(imageInNormalSize, 90, 90, false);
+        if (question != null) {
+
+            //Resize image, if it exists
+
+            if(new File(question.getImage()).exists()){
+
+                Bitmap imageInNormalSize = BitmapFactory.decodeFile(question.getImage());
+                Bitmap imageResized = Bitmap.createScaledBitmap(imageInNormalSize, 90, 90, false);
+
+                //Set text and image of the new Views
+                if (imageResized != null) {
+                    viewQuestionHolder.image.setImageBitmap(imageResized);
+                }
+                viewQuestionHolder.textAnswer.setText(question.getAnswer());
+
+            }else{
+
+                Log.e("EEEEEEE", "Image not found");
+
+                viewQuestionHolder.textAnswer.setText(question.getAnswer());
+
+            }
 
 
-        //Set text and image of the new Views
-        if (imageResized != null) {
-            viewQuestionHolder.image.setImageBitmap(imageResized);
+
         }
-        viewQuestionHolder.textAnswer.setText(question.getAnswer());
 
 
         return view;
