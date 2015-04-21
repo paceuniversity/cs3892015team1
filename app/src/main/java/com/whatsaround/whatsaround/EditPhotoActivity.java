@@ -252,7 +252,7 @@ public class EditPhotoActivity extends Activity {
         cursor.close();
 
         int orientation = getExifOrientation(picPath);
-        Bitmap bitmap = BitmapFactory.decodeFile(picPath);
+        Bitmap bitmap = decodeSampledBitmapFromResource(picPath, 500, 500);
         int rotate;
         switch(orientation){
             case 90: rotate = 90;
@@ -319,6 +319,44 @@ public class EditPhotoActivity extends Activity {
             }
         }
         return degree;
+    }
+
+    private static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
+    private static Bitmap decodeSampledBitmapFromResource(String uri, int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(uri, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(uri, options);
     }
 }
 

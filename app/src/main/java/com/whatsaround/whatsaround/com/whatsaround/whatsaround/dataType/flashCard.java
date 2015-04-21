@@ -10,6 +10,12 @@ public class flashCard {
     private Bitmap picture;
     private String word;
 
+    // Gotta have a constructor
+    public flashCard(String word, Bitmap picture) {
+        this.picture = picture;
+        this.word = word;
+    }
+
     public void setPicture(Bitmap picture) { this.picture = picture; }
 
     public Bitmap getPicture() {
@@ -22,6 +28,14 @@ public class flashCard {
 
     public String getWord() {
         return word;
+    }
+
+    public boolean checkCorrect(String word) {
+        // Returns true if the selected word is the word attributed to this flashCard
+        if( word == this.word )
+            return true;
+        else
+            return false;
     }
 
     @Override
