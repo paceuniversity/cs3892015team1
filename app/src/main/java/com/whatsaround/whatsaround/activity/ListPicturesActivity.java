@@ -1,4 +1,4 @@
-package com.whatsaround.whatsaround;
+package com.whatsaround.whatsaround.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -7,6 +7,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.whatsaround.whatsaround.adapter.CustomAdapter;
+import com.whatsaround.whatsaround.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

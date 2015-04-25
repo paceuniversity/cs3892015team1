@@ -1,4 +1,4 @@
-package com.whatsaround.whatsaround;
+package com.whatsaround.whatsaround.activity;
 
 import android.app.Activity;
 import android.content.CursorLoader;
@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.whatsaround.whatsaround.R;
 
 import java.io.IOException;
 

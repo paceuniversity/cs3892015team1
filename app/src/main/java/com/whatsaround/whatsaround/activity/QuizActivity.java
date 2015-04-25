@@ -1,4 +1,4 @@
-package com.whatsaround.whatsaround;
+package com.whatsaround.whatsaround.activity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,11 +6,7 @@ import android.content.CursorLoader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -23,7 +19,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.whatsaround.whatsaround.com.whatsaround.whatsaround.dataType.flashCard;
+import com.whatsaround.whatsaround.R;
+import com.whatsaround.whatsaround.dataType.flashCard;
 
 import org.json.JSONArray;
 import org.json.JSONException;

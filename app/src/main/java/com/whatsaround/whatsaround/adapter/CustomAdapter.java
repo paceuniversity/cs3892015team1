@@ -1,4 +1,4 @@
-package com.whatsaround.whatsaround;
+package com.whatsaround.whatsaround.adapter;
 
 import android.content.Context;
 import android.content.CursorLoader;
@@ -18,7 +18,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.whatsaround.whatsaround.R;
+import com.whatsaround.whatsaround.activity.ListPicturesActivity;
+import com.whatsaround.whatsaround.activity.PictureWordActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;

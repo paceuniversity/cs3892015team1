@@ -1,4 +1,4 @@
-package com.whatsaround.whatsaround.com.whatsaround.whatsaround.dataType;
+package com.whatsaround.whatsaround.dataType;
 
 /**
  * Created by Kyle on 03/29/2015.

@@ -1,4 +1,4 @@
-package com.whatsaround.whatsaround.com.whatsaround.whatsaround.dataType;
+package com.whatsaround.whatsaround.dataType;
 
 import android.graphics.Bitmap;
 import android.media.Image;

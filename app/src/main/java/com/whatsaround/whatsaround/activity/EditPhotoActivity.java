@@ -1,4 +1,4 @@
-package com.whatsaround.whatsaround;
+package com.whatsaround.whatsaround.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,7 +10,6 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -21,6 +20,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.whatsaround.whatsaround.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
