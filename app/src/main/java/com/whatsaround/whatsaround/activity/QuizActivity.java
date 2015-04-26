@@ -20,7 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.whatsaround.whatsaround.R;
-import com.whatsaround.whatsaround.dataType.flashCard;
+import com.whatsaround.whatsaround.data.QuestionDAO;
+import com.whatsaround.whatsaround.model.Question;
+//import com.whatsaround.whatsaround.dataType.flashCard;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +32,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 
@@ -41,7 +44,7 @@ public class QuizActivity extends Activity {
 
     int current = -1;
     int score = 0;
-    flashCard[] questions = new flashCard[5];
+    Question[] questions = new Question[5];
     TextView textScore;
     ImageView picture;
     Button option1, option2, option3, option4;
@@ -49,6 +52,7 @@ public class QuizActivity extends Activity {
     // Declare two array lists to store our words and URIs
     ArrayList<String> wordList = new ArrayList<String>();
     ArrayList<String> pictureList = new ArrayList<String>();
+    List<Question> questionsListed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +61,7 @@ public class QuizActivity extends Activity {
 
         // Copy pasted from the CustomAdapter
         // This will read the JSON input and add the word/uri to the appropriate ArrayList
-        File dir = getExternalFilesDir(null);
+        /*File dir = getExternalFilesDir(null);
         File file = new File(dir, FILE_NAME);
 
         try {
@@ -94,16 +98,18 @@ public class QuizActivity extends Activity {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        } */
+
+        questionsListed = QuestionDAO.getInstance(this).list();
 
         // This will set the picture and word for every item in the ArrayList
-        for (int i = 0; i < pictureList.size(); i++) {
+        /*for (int i = 0; i < pictureList.size(); i++) {
             String path = getRealPathFromURI(Uri.parse(pictureList.get(i)));
             //Bitmap bitmap = BitmapFactory.decodeFile(path);
             int orientation = getExifOrientation(path);
-            Bitmap bitmap = decodeSampledBitmapFromResource(path, 100, 100);
-            questions[i] = new flashCard(wordList.get(i), bitmap);
-        }
+            //Bitmap bitmap = decodeSampledBitmapFromResource(path, 100, 100);
+            questions[i] = new Question(wordList.get(i), path);
+        }*/
 
         // Create variables for our views
         picture = (ImageView)findViewById(R.id.picture);
@@ -135,7 +141,7 @@ public class QuizActivity extends Activity {
         option4.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               checkAnswer(v);
+                checkAnswer(v);
             }
         });
 
@@ -148,7 +154,7 @@ public class QuizActivity extends Activity {
         // If it's correct, we add 100 points to the user score and make a toast (to be replaced by positive indicator)
         // Otherwise, we subtract 50 points and make a toast (to be replaced by negative indicator)
         Button b = (Button)v;
-        if (questions[current].checkCorrect(b.getText().toString()) == true) {
+        if (questionsListed.get(current).checkCorrect(b.getText().toString()) == true) {
             score += 100;
             Toast.makeText(QuizActivity.this, "Correct", Toast.LENGTH_LONG).show();
             textScore.setText("Score: " + score);
@@ -173,12 +179,12 @@ public class QuizActivity extends Activity {
          */
         current++;
         // We'll set the current index back to the beginning if it is larger than the array
-        if( current >= pictureList.size())
+        if( current >= questionsListed.size())
             current = 0;
-        picture.setImageBitmap(questions[current].getPicture());
+        picture.setImageBitmap(decodeSampledBitmapFromResource(questionsListed.get(current).getImage(), 100, 100) );
         // Sets up an array containing the correct answer and three incorrect answers
-        String[] options = {questions[current].getWord(), removeLetter(questions[current].getWord()),
-                removeLetter(questions[current].getWord()), removeLetter(questions[current].getWord())};
+        String[] options = {questionsListed.get(current).getAnswer(), removeLetter(questionsListed.get(current).getAnswer()),
+                removeLetter(questionsListed.get(current).getAnswer()), removeLetter(questionsListed.get(current).getAnswer())};
         // Each array element will be swapped with a random array element
         for(int i = 0; i < options.length; i++) {
             String temp = options[i];
@@ -298,7 +304,7 @@ public class QuizActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_quiz, menu);
+        //getMenuInflater().inflate(R.menu.menu_quiz, menu);
         return true;
     }
 
