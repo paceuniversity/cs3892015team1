@@ -1,13 +1,9 @@
 package com.whatsaround.whatsaround.activity;
 
-import android.app.DialogFragment;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.ActionMode;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,13 +14,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.whatsaround.whatsaround.R;
 import com.whatsaround.whatsaround.adapter.QuestionsAdapter;
 import com.whatsaround.whatsaround.data.QuestionDAO;
 import com.whatsaround.whatsaround.dialog.DeletionDialog;
 import com.whatsaround.whatsaround.model.Question;
-import com.whatsaround.whatsaround.R;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -55,7 +50,7 @@ public class SettingsActivity extends ActionBarActivity implements AdapterView.O
         emptyListText = (TextView) findViewById(R.id.txt_empty_list);
         /* Take the listView (which is referenced inside the layout file of this Activity
         and pass the list of questions to it through the adapter.
-        Also make it handle clicks*/
+        Also make it handle simple clicks*/
         questionsListView = (ListView) findViewById(R.id.activity_settings_list);
         updateList(questionsListed);
         questionsListView.setOnItemClickListener(this);

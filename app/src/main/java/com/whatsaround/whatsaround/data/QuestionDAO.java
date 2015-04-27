@@ -33,8 +33,8 @@ public class QuestionDAO {
     * */
     //-------------------------------------
     private QuestionDAO(Context context) {
-        DataBaseHelper dataBaseHelper = DataBaseHelper.getInstance(context);
-        database = dataBaseHelper.getWritableDatabase();
+        DatabaseHelper databaseHelper = DatabaseHelper.getInstance(context);
+        database = databaseHelper.getWritableDatabase();
     }
 
     public static QuestionDAO getInstance(Context context) {
