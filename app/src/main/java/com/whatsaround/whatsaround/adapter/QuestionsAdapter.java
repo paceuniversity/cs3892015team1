@@ -3,12 +3,16 @@ package com.whatsaround.whatsaround.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.whatsaround.whatsaround.R;
 import com.whatsaround.whatsaround.model.Question;
@@ -22,12 +26,15 @@ public class QuestionsAdapter extends BaseAdapter {
 
     private List<Question> questions;
     private LayoutInflater inflater;
+    private Context activityContext;
+    private final String LOGTAG = "Question Adapter";
 
 
     public QuestionsAdapter(Context context, List<Question> questions) {
 
         this.questions = questions;
         this.inflater = LayoutInflater.from(context);
+        activityContext = context;
 
     }
 
@@ -90,8 +97,8 @@ public class QuestionsAdapter extends BaseAdapter {
 
         //Resize image
         //Bitmap imageInNormalSize = BitmapFactory.decodeFile(question.getImage());
-        Bitmap imageResized = decodeSampledBitmapFromResource(question.getImage(), 100, 100);
-
+        //Bitmap imageResized = decodeSampledBitmapFromResource(question.getImage(), 100, 100);
+        Bitmap imageResized = getRotatedBitmap(question.getImage());
 
         //Set text and image of the new Views
         if (imageResized != null) {
@@ -147,5 +154,50 @@ public class QuestionsAdapter extends BaseAdapter {
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeFile(uri, options);
+    }
+
+    private Bitmap getRotatedBitmap(String filePath){
+        Bitmap bitmap = decodeSampledBitmapFromResource(filePath, 100, 100);
+
+        ExifInterface exif = null;
+        try{
+            exif = new ExifInterface(filePath);
+        }
+        catch(Exception e){
+            Toast.makeText(activityContext, "The image is not a jpeg", Toast.LENGTH_LONG).show();
+        }
+        if(exif != null){
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
+            if(orientation != -1){
+                Matrix matrix = new Matrix();
+                switch(orientation){
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        Log.d(LOGTAG, "Rotate 90");
+                        matrix.postRotate(90);
+                        return Bitmap.createBitmap(
+                                bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        Log.d(LOGTAG, "Rotate 180");
+                        matrix.postRotate(180);
+                        return Bitmap.createBitmap(
+                                bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        Log.d(LOGTAG, "Rotate 270");
+                        matrix.postRotate(270);
+                        return Bitmap.createBitmap(
+                                bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    default:
+                        return bitmap;
+                }
+            }
+            else {
+                Toast.makeText(activityContext, "Could not get orientation", Toast.LENGTH_LONG).show();
+            }
+        }
+        else {
+            Toast.makeText(activityContext, "Image was never Loaded", Toast.LENGTH_SHORT).show();
+            return bitmap;
+        }
+        return bitmap;
     }
 }

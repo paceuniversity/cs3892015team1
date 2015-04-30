@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -12,7 +14,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -24,24 +28,21 @@ import com.whatsaround.whatsaround.R;
 public class EditQuestionActivity extends ActionBarActivity {
 
     public static final String LOG_KEY = EditQuestionActivity.class.getName();
-
+    private static final int REQUEST_IMAGE_CAPTURE  = 1;
     private static final int GALLERY_REQUEST_CODE = 2;
-
     private Question question;
-
     private boolean isEditionMode;
-
     private QuestionDAO questionDAO;
-
     private EditText answerView;
-
     private ImageView imageView;
-
     private String newImagePath;
+    private final String LOGTAG = "EditQuestions";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d(LOGTAG, "Starting Edit Question Activity");
 
         setContentView(R.layout.activity_edit_question);
 
@@ -68,15 +69,26 @@ public class EditQuestionActivity extends ActionBarActivity {
         //Therefore, take Views on this screen and assign the given Image and Answer (given in the Intent) as their values.
         if (isEditionMode) {
 
-
             if ((answerView != null) && (imageView != null)) {
                 answerView.setText(question.getAnswer());
-                imageView.setImageBitmap(decodeSampledBitmapFromResource(question.getImage(), 100, 100));
+                imageView.setImageBitmap(makeRotatedBitmap(question.getImage(), true));
+                //imageView.setImageBitmap(decodeSampledBitmapFromResource(question.getImage(), 100, 100));
             } else {
                 Log.i(LOG_KEY, "answerView is null.");
             }
 
         }
+
+        ImageButton cameraButton = (ImageButton)findViewById(R.id.btn_camera);
+        cameraButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+            }
+        });
         //Otherwise, show the default Layout
 
 
@@ -98,30 +110,19 @@ public class EditQuestionActivity extends ActionBarActivity {
         //If the "save question" menu is clicked, verify: If the Activity is in Edition Mode, then edit question on the database.
         //Otherwise, create another one in the database with the values given.
         if (id == R.id.mnu_save_question) {
-
-
             if (isEditionMode) {
-
                 editQuestion();
-
-
             } else {
-
                 saveQuestion();
-
             }
-
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
 
     public void goToGallery(View view) {
-
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
         startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
     }
 
@@ -133,9 +134,15 @@ public class EditQuestionActivity extends ActionBarActivity {
 
         //If the Activity that returned the Intent was the gallery Activity,
         // take the picture passed and set to ImageView
-        if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+        if (requestCode == GALLERY_REQUEST_CODE || requestCode == REQUEST_IMAGE_CAPTURE &&
+                resultCode == RESULT_OK && data != null) {
+            if(resultCode == REQUEST_IMAGE_CAPTURE){
+                Toast.makeText(EditQuestionActivity.this, "Picture Taken", Toast.LENGTH_LONG);
+            }
 
             Uri selectedImage = data.getData();
+
+            Log.d(LOGTAG, "Context is " + getApplicationContext());
 
             String[] filePath = {
                     MediaStore.Images.Media.DATA
@@ -148,12 +155,13 @@ public class EditQuestionActivity extends ActionBarActivity {
 
             newImagePath = cursor.getString(columnIndex);
 
+            Log.d(LOGTAG, "Path = " + newImagePath);
 
             cursor.close();
 
             //Toast.makeText(getApplicationContext(), newImagePath, Toast.LENGTH_LONG).show();
 
-            imageView.setImageBitmap(BitmapFactory.decodeFile(newImagePath));
+            imageView.setImageBitmap(makeRotatedBitmap(newImagePath, false));
 
         }
     }
@@ -277,5 +285,48 @@ public class EditQuestionActivity extends ActionBarActivity {
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeFile(uri, options);
+    }
+
+    private Bitmap makeRotatedBitmap(String filePath, boolean sample){
+        Bitmap bitmap;
+
+        if(sample){
+            bitmap = decodeSampledBitmapFromResource(filePath, 100, 100);
+        }
+        else bitmap = BitmapFactory.decodeFile(filePath);
+
+        ExifInterface exif = null;
+        try{
+            exif = new ExifInterface(filePath);
+        }
+        catch(Exception e ){
+            Toast.makeText(EditQuestionActivity.this, "Could not find image", Toast.LENGTH_LONG).show();
+        }
+        if(exif != null){
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
+            if(orientation != -1){
+                Matrix matrix = new Matrix();
+                switch(orientation){
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        Log.d(LOGTAG, "Rotate 90");
+                        matrix.postRotate(90);
+                        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        Log.d(LOGTAG, "Rotate 180");
+                        matrix.postRotate(180);
+                        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        Log.d(LOGTAG, "Rotate 270");
+                        matrix.postRotate(270);
+                        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    default:
+                        return bitmap;
+                }
+            }
+            else{
+                Log.d(LOGTAG, "The image is not a jpeg");
+            }
+        }
+        return bitmap;
     }
 }

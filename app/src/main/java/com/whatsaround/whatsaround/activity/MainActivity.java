@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -11,6 +12,8 @@ import com.whatsaround.whatsaround.R;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    private final String LOGTAG = "Main Activity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +39,7 @@ public class MainActivity extends ActionBarActivity {
     public void goToSettings(View view) {
 
         Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
-
+        Log.d(LOGTAG, "Starting Settings");
         startActivity(settingsIntent);
     }
 

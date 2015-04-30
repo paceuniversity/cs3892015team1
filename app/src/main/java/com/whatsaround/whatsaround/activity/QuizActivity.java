@@ -1,15 +1,11 @@
 package com.whatsaround.whatsaround.activity;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.CursorLoader;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.media.ExifInterface;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,36 +18,21 @@ import android.widget.Toast;
 import com.whatsaround.whatsaround.R;
 import com.whatsaround.whatsaround.data.QuestionDAO;
 import com.whatsaround.whatsaround.model.Question;
-//import com.whatsaround.whatsaround.dataType.flashCard;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 
 public class QuizActivity extends Activity {
     // Define some global variables that we're gonna work with
-    Context context = this;
-    private final String QUIZ_ACTIVITY = "QuizActivity";
-    private final String FILE_NAME = "WAData";
+    private final String LOGTAG = "QuizActivity";
 
     int current = -1;
     int score = 0;
-    Question[] questions = new Question[5];
     TextView textScore;
     ImageView picture;
     Button option1, option2, option3, option4;
 
     // Declare two array lists to store our words and URIs
-    ArrayList<String> wordList = new ArrayList<String>();
-    ArrayList<String> pictureList = new ArrayList<String>();
     List<Question> questionsListed;
 
     @Override
@@ -181,7 +162,8 @@ public class QuizActivity extends Activity {
         // We'll set the current index back to the beginning if it is larger than the array
         if( current >= questionsListed.size())
             current = 0;
-        picture.setImageBitmap(decodeSampledBitmapFromResource(questionsListed.get(current).getImage(), 100, 100) );
+        picture.setImageBitmap(getRotatedBitmap(questionsListed.get(current).getImage()));
+        //picture.setImageBitmap(decodeSampledBitmapFromResource(questionsListed.get(current).getImage(), 100, 100) );
         // Sets up an array containing the correct answer and three incorrect answers
         String[] options = {questionsListed.get(current).getAnswer(), removeLetter(questionsListed.get(current).getAnswer()),
                 removeLetter(questionsListed.get(current).getAnswer()), removeLetter(questionsListed.get(current).getAnswer())};
@@ -208,59 +190,8 @@ public class QuizActivity extends Activity {
         return sb.toString();
     }
 
-    public JSONArray readFile(File file, int test) throws IOException, JSONException {
-        FileInputStream fis = new FileInputStream(file);
-        BufferedInputStream bis = new BufferedInputStream(fis);
-        StringBuffer b = new StringBuffer();
-        while (bis.available() != 0) {
-            char c = (char) bis.read();
-            b.append(c);
-        }
-        bis.close();
-        fis.close();
-
-        JSONArray tester = new JSONArray(b.toString());
-        return tester;
-    }
-
     // CREATE A CLASS FOR THE ROTATE/RESIZE METHODS SINCE LIKE THREE CLASSES DEFINE THEM
 
-    private String getRealPathFromURI(Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        CursorLoader loader = new CursorLoader(this.context, contentUri, proj, null, null, null);
-        Cursor cursor = loader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
-    }
-
-    private int getExifOrientation(String filepath) {// YOUR MEDIA PATH AS STRING
-        int degree = 0;
-        ExifInterface exif = null;
-        try {
-            exif = new ExifInterface(filepath);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        if (exif != null) {
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
-            if (orientation != -1) {
-                switch (orientation) {
-                    case ExifInterface.ORIENTATION_ROTATE_90:
-                        degree = 90;
-                        break;
-                    case ExifInterface.ORIENTATION_ROTATE_180:
-                        degree = 180;
-                        break;
-                    case ExifInterface.ORIENTATION_ROTATE_270:
-                        degree = 270;
-                        break;
-                }
-
-            }
-        }
-        return degree;
-    }
 
     private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -321,5 +252,53 @@ public class QuizActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private Bitmap getRotatedBitmap(String filePath){
+        Bitmap bitmap = decodeSampledBitmapFromResource(filePath, 100, 100);
+
+        ExifInterface exif = null;
+        try{
+            exif = new ExifInterface(filePath);
+        }
+        catch(Exception e){
+            Toast.makeText(QuizActivity.this, "The image is not a jpeg", Toast.LENGTH_LONG);
+        }
+
+        if(exif != null){
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
+            if(orientation != -1){
+                Matrix matrix = new Matrix();
+                switch(orientation) {
+                    case (ExifInterface.ORIENTATION_ROTATE_90):
+                        Log.d(LOGTAG, "Rotate 90");
+                        matrix.postRotate(90);
+                        return Bitmap.createBitmap(
+                                bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    case (ExifInterface.ORIENTATION_ROTATE_180):
+                        Log.d(LOGTAG, "Rotate 180");
+                        matrix.postRotate(180);
+                        return Bitmap.createBitmap(
+                                bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    case (ExifInterface.ORIENTATION_ROTATE_270):
+                        Log.d(LOGTAG, "Rotate 270");
+                        matrix.postRotate(270);
+                        return Bitmap.createBitmap(
+                                bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    default:
+                        Log.d(LOGTAG, "No rotation");
+                        return bitmap;
+                }
+            }
+            else{
+                Toast.makeText(
+                        QuizActivity.this, "The picture was never loaded", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else{
+            Toast.makeText(
+                    QuizActivity.this, "The picture was never loaded", Toast.LENGTH_SHORT).show();
+        }
+        return bitmap;
     }
 }
