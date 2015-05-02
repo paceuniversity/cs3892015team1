@@ -163,14 +163,28 @@ public class QuizActivity extends Activity {
         if( current >= questionsListed.size())
             current = 0;
         picture.setImageBitmap(getRotatedBitmap(questionsListed.get(current).getImage()));
+        // We're gonna create an array of positions to delete and initialize it with all -1s
+        int[] deletions = {-1, -1, -1};
+        // For each element in the deletions array, we want to generate a letter to delete
+        for (int i = 0; i < deletions.length; i++) {
+            // We'll generate a number once
+            // If the position equals the position in either of the earlier elements, we'll generate a new number
+            // We'll keep doing this until we get a new number
+            do {
+                deletions[i] = Math.abs( new Random().nextInt() ) % questionsListed.get(current).getAnswer().length();
+            } while ( ( deletions[i] == deletions[0] && i > 0) || ( deletions[i] == deletions[1] && i > 1) );
+        }
         //picture.setImageBitmap(decodeSampledBitmapFromResource(questionsListed.get(current).getImage(), 100, 100) );
         // Sets up an array containing the correct answer and three incorrect answers
-        String[] options = {questionsListed.get(current).getAnswer(), removeLetter(questionsListed.get(current).getAnswer()),
-                removeLetter(questionsListed.get(current).getAnswer()), removeLetter(questionsListed.get(current).getAnswer())};
+        String[] options = {questionsListed.get(current).getAnswer(), removeLetter(questionsListed.get(current).getAnswer(), deletions[0]),
+                removeLetter(questionsListed.get(current).getAnswer(), deletions[1]), removeLetter(questionsListed.get(current).getAnswer(), deletions[2])};
         // Each array element will be swapped with a random array element
         for(int i = 0; i < options.length; i++) {
             String temp = options[i];
-            int swapped = new Random().nextInt(options.length);
+            // We'll generate a random number and make sure it's positive (nextInt can return negatives)
+            // We'll then mod it by the length of the array (4)
+            // Then, we'll swap the element being worked on with the randomly generated element
+            int swapped = Math.abs( new Random().nextInt() ) % options.length;
             options[i] = options[swapped];
             options[swapped] = temp;
 
@@ -184,9 +198,14 @@ public class QuizActivity extends Activity {
 
     // Removes a random string from the first letter that's not the first letter
     // This may be improvable in the future to simulate really good child spelling errors
-    private String removeLetter(String word) {
+    private String removeLetter(String word, int letterPos) {
+        // If the letter to be removed is in position 0, we'll append an e onto the end of the word
+        // This keeps us from removing the first letter but for words that only have three letters, there won't be duplicate choices
         StringBuilder sb = new StringBuilder(word);
-        sb.deleteCharAt( new Random().nextInt(word.length()-1) + 1 );
+        if (letterPos == 0)
+            sb.append('e');
+        else
+            sb.deleteCharAt( letterPos );
         return sb.toString();
     }
 
