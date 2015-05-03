@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -141,6 +142,10 @@ public class QuizActivity extends Activity {
         if (questionsListed.get(current).checkCorrect(b.getText().toString()) == true) {
             score += 100;
             textScore.setText("Score: " + score);
+            // Plays a sound
+            // This will have to be the 'correct' indication sound
+            MediaPlayer mp = MediaPlayer.create(QuizActivity.this, R.raw.test);
+            mp.start();
             Toast toast = new Toast(this);
             ImageView result = new ImageView(this);
             result.setImageResource(R.drawable.checkmark);
