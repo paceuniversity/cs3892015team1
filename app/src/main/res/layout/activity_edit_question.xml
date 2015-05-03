@@ -54,7 +54,8 @@
             android:background="?attr/selectableItemBackground"
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
-            android:text="Camera" />
+            android:text="Camera"
+            android:onClick="goToCamera"/>
     </LinearLayout>
 
 

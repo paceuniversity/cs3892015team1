@@ -3,8 +3,7 @@ package com.whatsaround.whatsaround.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +11,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.whatsaround.whatsaround.R;
-import com.whatsaround.whatsaround.model.Question;
+import com.whatsaround.whatsaround.dataType.Question;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 
 //Android will call its methods when creating the list in the Activity that reference this adapter
@@ -26,17 +27,57 @@ public class QuestionsAdapter extends BaseAdapter {
 
     private List<Question> questions;
     private LayoutInflater inflater;
-    private Context activityContext;
-    private final String LOGTAG = "Question Adapter";
+    private HashMap<Integer, Boolean> questionsSelected = new HashMap<>();
 
 
     public QuestionsAdapter(Context context, List<Question> questions) {
 
         this.questions = questions;
         this.inflater = LayoutInflater.from(context);
-        activityContext = context;
+
 
     }
+
+
+    public void setNewSelection(int position, boolean isSelected) {
+
+        questionsSelected.put(position, isSelected);
+        notifyDataSetChanged();
+
+    }
+
+
+    public boolean isQuestionSelected(int questionPosition) {
+
+        Boolean result = questionsSelected.get(questionPosition);
+        return result == null ? false : result;
+
+    }
+
+
+    public Set<Integer> getPositionsOfSelectedQuestions() {
+
+        return questionsSelected.keySet();
+
+    }
+
+
+    public void removeSelection(int position) {
+
+        questionsSelected.remove(position);
+        notifyDataSetChanged();
+
+    }
+
+
+    public void clearEntireSelection() {
+
+        questionsSelected = new HashMap<>();
+        notifyDataSetChanged();
+
+    }
+
+
 
 
     @Override
@@ -67,7 +108,19 @@ public class QuestionsAdapter extends BaseAdapter {
         ViewQuestionHolder viewQuestionHolder;
 
 
-        Question question = questions.get(position);
+        Question question = null;
+        if (!questions.isEmpty()) {
+            question = questions.get(position);
+            Log.e("EEEEEEE", String.valueOf(questions.size()));
+            Log.e("EEEEEEE", question.getAnswer());
+        }
+
+
+        if (question == null) {
+            Log.e("EEEEEEE", String.valueOf(position));
+        } else {
+            Log.e("EEEEEEE", "question not null");
+        }
 
 
         //If Android did not pass a View (through convertView) that can be recycled, create (inflate) a new one
@@ -95,16 +148,41 @@ public class QuestionsAdapter extends BaseAdapter {
         }
 
 
-        //Resize image
-        //Bitmap imageInNormalSize = BitmapFactory.decodeFile(question.getImage());
-        //Bitmap imageResized = decodeSampledBitmapFromResource(question.getImage(), 100, 100);
-        Bitmap imageResized = getRotatedBitmap(question.getImage());
 
-        //Set text and image of the new Views
-        if (imageResized != null) {
-            viewQuestionHolder.image.setImageBitmap(imageResized);
+
+        if (question != null) {
+
+            //Resize image, if it exists
+
+            if (new File(question.getImage()).exists()) {
+
+                Bitmap imageInNormalSize = BitmapFactory.decodeFile(question.getImage());
+                Bitmap imageResized = Bitmap.createScaledBitmap(imageInNormalSize, 90, 90, false);
+
+                //Set text and image of the new Views
+                if (imageResized != null) {
+                    viewQuestionHolder.image.setImageBitmap(imageResized);
+                }
+                viewQuestionHolder.textAnswer.setText(question.getAnswer());
+
+            } else {
+
+                Log.e("EEEEEEE", "Image not found");
+
+                viewQuestionHolder.textAnswer.setText(question.getAnswer());
+
+            }
+
+
         }
-        viewQuestionHolder.textAnswer.setText(question.getAnswer());
+
+
+
+        if (questionsSelected.get(position) != null) {
+            view.setBackgroundColor(Color.parseColor("#BBDEFB"));
+        }else{
+            view.setBackgroundColor(Color.TRANSPARENT);
+        }
 
 
         return view;
@@ -116,88 +194,5 @@ public class QuestionsAdapter extends BaseAdapter {
 
         public ImageView image;
         public TextView textAnswer;
-    }
-
-    private static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
-
-    private static Bitmap decodeSampledBitmapFromResource(String uri, int reqWidth, int reqHeight) {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(uri, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeFile(uri, options);
-    }
-
-    private Bitmap getRotatedBitmap(String filePath){
-        Bitmap bitmap = decodeSampledBitmapFromResource(filePath, 100, 100);
-
-        ExifInterface exif = null;
-        try{
-            exif = new ExifInterface(filePath);
-        }
-        catch(Exception e){
-            Toast.makeText(activityContext, "The image is not a jpeg", Toast.LENGTH_LONG).show();
-        }
-        if(exif != null){
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
-            if(orientation != -1){
-                Matrix matrix = new Matrix();
-                switch(orientation){
-                    case ExifInterface.ORIENTATION_ROTATE_90:
-                        Log.d(LOGTAG, "Rotate 90");
-                        matrix.postRotate(90);
-                        return Bitmap.createBitmap(
-                                bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                    case ExifInterface.ORIENTATION_ROTATE_180:
-                        Log.d(LOGTAG, "Rotate 180");
-                        matrix.postRotate(180);
-                        return Bitmap.createBitmap(
-                                bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                    case ExifInterface.ORIENTATION_ROTATE_270:
-                        Log.d(LOGTAG, "Rotate 270");
-                        matrix.postRotate(270);
-                        return Bitmap.createBitmap(
-                                bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                    default:
-                        return bitmap;
-                }
-            }
-            else {
-                Toast.makeText(activityContext, "Could not get orientation", Toast.LENGTH_LONG).show();
-            }
-        }
-        else {
-            Toast.makeText(activityContext, "Image was never Loaded", Toast.LENGTH_SHORT).show();
-            return bitmap;
-        }
-        return bitmap;
     }
 }

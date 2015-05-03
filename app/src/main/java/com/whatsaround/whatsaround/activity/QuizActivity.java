@@ -8,20 +8,17 @@ import android.media.ExifInterface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.whatsaround.whatsaround.R;
 import com.whatsaround.whatsaround.data.QuestionDAO;
-import com.whatsaround.whatsaround.model.Question;
+import com.whatsaround.whatsaround.dataType.Question;
 import java.util.List;
 import java.util.Random;
 
@@ -44,57 +41,10 @@ public class QuizActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
-        // Copy pasted from the CustomAdapter
-        // This will read the JSON input and add the word/uri to the appropriate ArrayList
-        /*File dir = getExternalFilesDir(null);
-        File file = new File(dir, FILE_NAME);
-
-        try {
-            JSONArray json = readFile(file,1);
-
-            for (int i = 0; i < json.length(); i++)
-            {
-                // Declare and initialize so the compiler doesn't complain
-                String word = "", uri = "";
-                // We'll check to see if the current JSONObject has the "word" attribute
-                // If it doesn't, we'll ignore any "uri" or "word" attribute
-                if( json.getJSONObject(i).has("word") ) {
-                    uri = json.getJSONObject(i).getString("uri");
-                }
-                if( json.getJSONObject(i).has("word") ) {
-                    word = json.getJSONObject(i).getString("word");
-                }
-                Log.d(QUIZ_ACTIVITY, word);
-                // image.setImageBitmap(BitmapFactory.decodeFile(uri));
-                // We make sure the JSONObject has a set "word" attribute, a set "uri" attribute, and is not something like "android.widget.EditText..."
-                // I had a few instances of the last case and it made things very odd
-                if  (!json.getJSONObject(i).isNull("word") && !json.getJSONObject(i).isNull("uri") &&
-                        !json.getJSONObject(i).getString("word").matches("android.widget.EditText@(.*)") ) {
-                    // Add both the word and uri to their corresponding ArrayLists
-                    Log.d(QUIZ_ACTIVITY, "The word is: " + word);
-                    wordList.add(word);
-                    Log.d(QUIZ_ACTIVITY, "The uri is: " + uri);
-                    pictureList.add(uri);
-                }
-            }
-
-            //listItems.add(String.valueOf(readFile(file,1)));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } */
 
         questionsListed = QuestionDAO.getInstance(this).list();
 
-        // This will set the picture and word for every item in the ArrayList
-        /*for (int i = 0; i < pictureList.size(); i++) {
-            String path = getRealPathFromURI(Uri.parse(pictureList.get(i)));
-            //Bitmap bitmap = BitmapFactory.decodeFile(path);
-            int orientation = getExifOrientation(path);
-            //Bitmap bitmap = decodeSampledBitmapFromResource(path, 100, 100);
-            questions[i] = new Question(wordList.get(i), path);
-        }*/
+
 
         // Create variables for our views
         picture = (ImageView)findViewById(R.id.picture);

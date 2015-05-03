@@ -1,4 +1,4 @@
-package com.whatsaround.whatsaround.model;
+package com.whatsaround.whatsaround.dataType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -68,8 +68,8 @@ public class Question implements Serializable {
     }
 
     public boolean checkCorrect(String word) {
-        // Returns true if the selected word is the word attributed to this flashCard
-        if( word == this.answer )
+        // Returns true if the selected word is the word attributed to this Question
+        if(word.equals(this.answer))
             return true;
         else
             return false;

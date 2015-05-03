@@ -5,12 +5,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class DataBaseHelper extends SQLiteOpenHelper {
+public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     public static final String DATABASE_NAME = "whats_around_db";
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 6;
 
     private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + QuestionsContract.TABLE_NAME;
     private static final String SQL_CREATE_TABLE =
@@ -22,25 +22,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 
     //--------------
-    //This piece of code avoids that an instance of DataBaseHelper be create externally, avoiding the creation
+    //This piece of code avoids that an instance of DatabaseHelper be create externally, avoiding the creation
     //of many instances. An instance is created only one time and returned.
     //
     //This is a Design Pattern name Singleton. It is used when it doesn't make sense to have more than one instances of
-    //the same class in an application. In this case, DataBaseHelper is the interface between the application and the
+    //the same class in an application. In this case, DatabaseHelper is the interface between the application and the
     //database and we don't need more than one of it. Therefore, we implement this Design Pattern.
-    private static DataBaseHelper dataBaseHelper;
+    private static DatabaseHelper databaseHelper;
 
-    public static DataBaseHelper getInstance(Context context) {
+    public static DatabaseHelper getInstance(Context context) {
 
-        if (dataBaseHelper == null) {
-            dataBaseHelper = new DataBaseHelper(context);
+        if (databaseHelper == null) {
+            databaseHelper = new DatabaseHelper(context);
         }
 
-        return dataBaseHelper;
+        return databaseHelper;
 
     }
 
-    private DataBaseHelper(Context context) {
+    private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     //-----------------
