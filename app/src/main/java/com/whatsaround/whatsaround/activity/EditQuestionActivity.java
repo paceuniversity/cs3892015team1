@@ -291,9 +291,9 @@ public class EditQuestionActivity extends ActionBarActivity {
         Bitmap bitmap;
 
         if(sample){
-            bitmap = decodeSampledBitmapFromResource(filePath, 100, 100);
+            bitmap = decodeSampledBitmapFromResource(filePath, 350, 350);
         }
-        else bitmap = BitmapFactory.decodeFile(filePath);
+        else bitmap = decodeSampledBitmapFromResource(filePath, 350,350);
 
         ExifInterface exif = null;
         try{

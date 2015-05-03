@@ -7,11 +7,14 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -137,14 +140,25 @@ public class QuizActivity extends Activity {
         Button b = (Button)v;
         if (questionsListed.get(current).checkCorrect(b.getText().toString()) == true) {
             score += 100;
-            Toast.makeText(QuizActivity.this, "Correct", Toast.LENGTH_LONG).show();
             textScore.setText("Score: " + score);
+            Toast toast = new Toast(this);
+            ImageView result = new ImageView(this);
+            result.setImageResource(R.drawable.checkmark);
+            toast.setView(result);
+            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.show();
         } else {
             score -= 50;
+
             if (score < 0)
                 score = 0;
-            Toast.makeText(QuizActivity.this, "Incorrect", Toast.LENGTH_LONG).show();
             textScore.setText("Score: " + score);
+            Toast toast = new Toast(this);
+            ImageView result = new ImageView(this);
+            result.setImageResource(R.drawable.wrong);
+            toast.setView(result);
+            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.show();
         }
         // Then we get the next question
         getNextQuestion();
@@ -274,7 +288,7 @@ public class QuizActivity extends Activity {
     }
 
     private Bitmap getRotatedBitmap(String filePath){
-        Bitmap bitmap = decodeSampledBitmapFromResource(filePath, 100, 100);
+        Bitmap bitmap = decodeSampledBitmapFromResource(filePath, 350, 350);
 
         ExifInterface exif = null;
         try{
