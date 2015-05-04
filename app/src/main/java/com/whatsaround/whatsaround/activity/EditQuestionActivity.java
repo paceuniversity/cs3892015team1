@@ -2,6 +2,7 @@ package com.whatsaround.whatsaround.activity;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -214,7 +215,9 @@ public class EditQuestionActivity extends ActionBarActivity {
 
 
             //Set image taken from the gallery and put on imageView
-            imageView.setImageBitmap(BitmapFactory.decodeFile(newImagePath));
+            Bitmap imageInNormalSize = BitmapFactory.decodeFile(newImagePath);
+            Bitmap imageResized = Bitmap.createScaledBitmap(imageInNormalSize, 250, 250, false);
+            imageView.setImageBitmap(imageResized);
 
 
         } else if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
@@ -235,7 +238,10 @@ public class EditQuestionActivity extends ActionBarActivity {
 
 
             //Put image received from the camera in the imageView
-            imageView.setImageBitmap(BitmapFactory.decodeFile(newImagePath));
+
+            Bitmap imageInNormalSize = BitmapFactory.decodeFile(newImagePath);
+            Bitmap imageResized = Bitmap.createScaledBitmap(imageInNormalSize, 250, 250, false);
+            imageView.setImageBitmap(imageResized);
 
         }
     }
