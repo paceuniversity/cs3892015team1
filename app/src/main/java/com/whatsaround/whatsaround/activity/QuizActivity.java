@@ -8,6 +8,7 @@ import android.media.ExifInterface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +39,7 @@ public class QuizActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
@@ -94,9 +96,10 @@ public class QuizActivity extends Activity {
             textScore.setText("Score: " + score);
             // Plays a sound
             // This will have to be the 'correct' indication sound
-            MediaPlayer mp = MediaPlayer.create(QuizActivity.this, R.raw.test);
+            MediaPlayer mp = MediaPlayer.create(QuizActivity.this, R.raw.right_answer);
             mp.start();
             Toast toast = new Toast(this);
+            toast.setGravity(Gravity.CENTER, 0, 0);
             ImageView result = new ImageView(this);
             result.setImageResource(R.drawable.checkmark);
             toast.setView(result);
@@ -108,7 +111,12 @@ public class QuizActivity extends Activity {
             if (score < 0)
                 score = 0;
             textScore.setText("Score: " + score);
+
+            MediaPlayer mp = MediaPlayer.create(QuizActivity.this, R.raw.wrong_answer);
+            mp.start();
+
             Toast toast = new Toast(this);
+            toast.setGravity(Gravity.CENTER, 0, 0);
             ImageView result = new ImageView(this);
             result.setImageResource(R.drawable.wrong);
             toast.setView(result);
@@ -222,23 +230,11 @@ public class QuizActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_quiz, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 

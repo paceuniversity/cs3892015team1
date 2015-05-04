@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.whatsaround.whatsaround" > <!-- >Camera usage< -->
+    package="com.whatsaround.whatsaround"> <!-- >Camera usage< -->
     <uses-sdk
         android:minSdkVersion="11"
         android:targetSdkVersion="19" />
@@ -19,14 +19,15 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:theme="@style/Theme.MyTheme">
 
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,7 +38,8 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".activity.MainActivity">
+            android:parentActivityName=".activity.MainActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.whatsaround.whatsaround.activity.MainActivity" />
@@ -46,7 +48,8 @@
         <activity
             android:name=".activity.EditQuestionActivity"
             android:label="@string/title_activity_edit_question"
-            android:parentActivityName=".activity.SettingsActivity">
+            android:parentActivityName=".activity.SettingsActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.whatsaround.whatsaround.activity.SettingsActivity" />
@@ -55,7 +58,8 @@
         <activity
             android:name=".activity.QuizActivity"
             android:label="@string/title_activity_quiz"
-            android:parentActivityName=".activity.QuizActivity">
+            android:parentActivityName=".activity.QuizActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.whatsaround.whatsaround.activity.QuizActivity" />

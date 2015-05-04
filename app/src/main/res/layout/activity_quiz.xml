@@ -6,9 +6,13 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="317dp"
+        android:layout_height="250dp"
         android:id="@+id/picture"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"/>
 
     <TableLayout
         android:layout_width="match_parent"
@@ -19,26 +23,50 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Option1"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            android:background="#64b5f6"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:id="@+id/option1" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            android:background="#64b5f6"
             android:text="Option2"
+            android:layout_marginBottom="10dp"
             android:id="@+id/option2"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_gravity="right" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Option3"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            android:background="#64b5f6"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:id="@+id/option3" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Option4"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            android:background="#64b5f6"
+            android:layout_marginBottom="20dp"
             android:id="@+id/option4"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_gravity="right" />
 
     </TableLayout>
@@ -47,6 +75,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_gravity="center"
+        android:textSize="18sp"
         android:text="Score: 0"
         android:id="@+id/score" />
 

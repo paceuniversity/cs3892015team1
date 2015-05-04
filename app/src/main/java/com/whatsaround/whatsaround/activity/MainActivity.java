@@ -1,14 +1,17 @@
 package com.whatsaround.whatsaround.activity;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.whatsaround.whatsaround.R;
+import com.whatsaround.whatsaround.data.QuestionDAO;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -48,7 +51,19 @@ public class MainActivity extends ActionBarActivity {
         //Implement link to child perspective
         Intent playIntent = new Intent(getApplicationContext(), QuizActivity.class);
 
-        //Intent to QuizActivity (create this Activity)
-        startActivity(playIntent);
+
+        if(QuestionDAO.getInstance(getApplicationContext()).list().isEmpty()){
+
+            MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.wrong_answer);
+            mp.start();
+
+            Toast.makeText(getApplicationContext(), "No Questions Registered", Toast.LENGTH_SHORT).show();
+        }else{
+
+            //Intent to QuizActivity
+            startActivity(playIntent);
+
+        }
+
     }
 }
